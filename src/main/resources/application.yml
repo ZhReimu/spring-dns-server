@@ -1,0 +1,11 @@
+spring:
+  datasource:
+    url: jdbc:sqlite:dns.db
+    driver-class-name: org.sqlite.JDBC
+logging:
+  level:
+    root: info
+    com.mrx: debug
+mybatis-plus:
+  global-config:
+    banner: off

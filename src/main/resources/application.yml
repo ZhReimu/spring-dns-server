@@ -6,6 +6,8 @@ logging:
   level:
     root: info
     com.mrx: debug
+  file:
+    path: log
 mybatis-plus:
   global-config:
     banner: off

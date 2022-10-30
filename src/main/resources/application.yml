@@ -13,4 +13,4 @@ dns:
   port: 53
   name: test
   mode: bio
-  cfip: 104.21.44.192
+  cfip: 172.67.186.61

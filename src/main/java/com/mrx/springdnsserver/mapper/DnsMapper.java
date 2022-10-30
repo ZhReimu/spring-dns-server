@@ -36,6 +36,7 @@ public interface DnsMapper extends IHostRepository {
         // 普通域名解析
         List<String> hosts = getIPsByHost(nKey);
         if (hosts == null || hosts.isEmpty()) {
+            Host host = new Host(nKey);
             try {
                 logger.warn("开始递归解析: {}", nKey);
                 // 如果没有手动指定 hosts, 那就尝试调用系统 dns 的结果
@@ -43,7 +44,6 @@ public interface DnsMapper extends IHostRepository {
                     List<String> res = Arrays.stream(InetAddress.getAllByName(nKey))
                             .map(InetAddress::getHostAddress)
                             .collect(Collectors.toList());
-                    Host host = new Host().setHost(nKey);
                     if (addHost(host)) {
                         logger.debug("插入 host 记录成功");
                         Dns dns = new Dns().setHostId(host.getId()).setIps(res);
@@ -60,6 +60,7 @@ public interface DnsMapper extends IHostRepository {
                 });
             } catch (Exception e) {
                 logger.warn("调用系统 dns 出错:", e);
+                addErrorHost(host);
                 hosts = Collections.emptyList();
             }
         }
@@ -80,6 +81,9 @@ public interface DnsMapper extends IHostRepository {
             " </foreach>" +
             "</script>")
     Boolean addDns(Dns dns);
+
+    @Insert("INSERT INTO tb_host_error(host) VALUES (#{host})")
+    void addErrorHost(Host host);
 
     @Select("SELECT ip FROM tb_dns WHERE host_id = #{hostId}")
     List<String> getIpsByHostId(@Param("hostId") Integer hostId);

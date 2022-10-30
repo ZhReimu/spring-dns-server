@@ -1,0 +1,18 @@
+spring:
+  datasource:
+    url: jdbc:sqlite:dns.db
+    driver-class-name: org.sqlite.JDBC
+logging:
+  level:
+    root: info
+    com.mrx: debug
+  file:
+    path: log
+mybatis-plus:
+  global-config:
+    banner: off
+dns:
+  port: 53
+  name: test
+  mode: bio
+  cfip: 172.67.186.61

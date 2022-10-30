@@ -44,11 +44,10 @@ public class HostsHashMap implements IHostRepository {
     /**
      * 使用 host 查找对应的 ip
      *
-     * @param key host
+     * @param host host ( 域名 )
      * @return 找到的 与 该 host 对应的 ip, 如果真的找不到, 那将返回 {@link Collections#emptyList()}
      */
-    public List<String> get(String key) {
-        String nKey = key.substring(0, key.length() - 1);
+    public List<String> getIpsByHost(String host) {
         // key: www.baidu.com.
         // map: *.baidu.com -> 127.0.0.1
         // m.baidu.com, www.baidu.com, baidu.com
@@ -58,19 +57,19 @@ public class HostsHashMap implements IHostRepository {
             if (entryKey.contains("*")) {
                 if (entryKey.startsWith("*.")) entryKey = entryKey.replace("*.", "");
                 else entryKey = entryKey.replace("*", "");
-                if (nKey.endsWith(entryKey)) return entry.getValue();
+                if (host.endsWith(entryKey)) return entry.getValue();
             }
         }
-        List<String> hosts = map.get(nKey);
+        List<String> hosts = map.get(host);
         if (hosts == null || hosts.isEmpty()) {
             try {
-                logger.warn("开始递归解析: {}", nKey);
+                logger.warn("开始递归解析: {}", host);
                 // 如果没有手动指定 hosts, 那就尝试调用系统 dns 的结果
                 return runMeasure(() -> {
-                    List<String> res = Arrays.stream(InetAddress.getAllByName(nKey))
+                    List<String> res = Arrays.stream(InetAddress.getAllByName(host))
                             .map(InetAddress::getHostAddress)
                             .collect(Collectors.toList());
-                    map.put(nKey, res);
+                    map.put(host, res);
                     logger.debug("本次解析结果已缓存");
                     return res;
                 });

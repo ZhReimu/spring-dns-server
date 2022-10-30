@@ -13,12 +13,25 @@ import java.util.List;
 public interface IHostRepository {
 
     /**
-     * 使用 域名 查找 ip
+     * 使用 域名 查找 ip, 与 {@link #getIpsByHost(String)} 不同的是, 本方法会计算执行时间<br/>
+     * 以及 本方法会去除 dns 请求域名后的 .
      *
-     * @param key dns 请求 中的 域名, 末尾有 .
+     * @param host 要查找 ip 的 域名, 末尾带 .
      * @return 该域名的 ip
      */
-    List<String> get(String key);
+    default List<String> get(String host) {
+        // 去除 dns 查询的域名后缀 .
+        String nKey = host.substring(0, host.length() - 1);
+        return runMeasure(() -> getIpsByHost(nKey));
+    }
+
+    /**
+     * 使用 域名 查找 ip
+     *
+     * @param host dns 请求 中的 域名, 末尾不带 .
+     * @return 该域名的 ip
+     */
+    List<String> getIpsByHost(String host);
 
     @SneakyThrows
     default <T> T runMeasure(XSupplier<T> supplier) {

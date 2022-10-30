@@ -23,22 +23,17 @@ public interface DnsMapper extends IHostRepository {
     @Select("SELECT ip FROM tb_dns WHERE host_id = (SELECT id FROM tb_host WHERE host = #{host})")
     List<String> getIPsByHost(@Param("host") String host);
 
-    @Insert("INSERT INTO tb_host(host) VALUES (#{host})")
-    @Options(useGeneratedKeys = true, keyProperty = "id", keyColumn = "id")
-    Boolean addHost(Host host);
-
-    @Insert("<script> " +
-            "INSERT INTO tb_dns(host_id, ip) VALUES " +
-            "<foreach collection=\"ips\" item=\"ip\" separator=\",\" > " +
-            "        (#{hostId},#{ip})" +
-            " </foreach>" +
-            "</script>")
-    Boolean addDns(Dns dns);
-
     @Override
-    default List<String> get(String key) {
+    default List<String> getIpsByHost(String nKey) {
         Logger logger = LoggerFactory.getLogger(DnsMapper.class);
-        String nKey = key.substring(0, key.length() - 1);
+        // 实现 泛域名解析
+        for (Host host : listGenericDomains()) {
+            String gHost = host.getHost();
+            gHost = gHost.startsWith("*.") ? gHost.replace("*.", "") :
+                    gHost.replace("*", "");
+            if (nKey.endsWith(gHost)) return getIpsByHostId(host.getId());
+        }
+        // 普通域名解析
         List<String> hosts = getIPsByHost(nKey);
         if (hosts == null || hosts.isEmpty()) {
             try {
@@ -70,5 +65,23 @@ public interface DnsMapper extends IHostRepository {
         }
         return hosts;
     }
+
+    @Select("SELECT id,host FROM tb_host WHERE host LIKE '%*%'")
+    List<Host> listGenericDomains();
+
+    @Insert("INSERT INTO tb_host(host) VALUES (#{host})")
+    @Options(useGeneratedKeys = true, keyProperty = "id", keyColumn = "id")
+    Boolean addHost(Host host);
+
+    @Insert("<script> " +
+            "INSERT INTO tb_dns(host_id, ip) VALUES " +
+            "<foreach collection=\"ips\" item=\"ip\" separator=\",\" > " +
+            "        (#{hostId},#{ip})" +
+            " </foreach>" +
+            "</script>")
+    Boolean addDns(Dns dns);
+
+    @Select("SELECT ip FROM tb_dns WHERE host_id = #{hostId}")
+    List<String> getIpsByHostId(@Param("hostId") Integer hostId);
 
 }

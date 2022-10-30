@@ -42,7 +42,8 @@ public class DefaultDnsServer extends AbsDnsServer {
      * @param serverName 服务器名字
      * @param handlers   其能处理的 Question 的 handler
      */
-    private DefaultDnsServer(String serverName, IRecordHandler... handlers) {
+    private DefaultDnsServer(String serverName, int port, IRecordHandler... handlers) {
+        super(port);
         SERVER_NAME = Name.fromConstantString(serverName.endsWith(".") ? serverName : serverName + ".");
         // ns handler 放最先, 不管怎么样都会修改 ns 为 权威响应
         recordHandlerChain.add(nsRecordHandler);
@@ -64,11 +65,11 @@ public class DefaultDnsServer extends AbsDnsServer {
      * @param serverName 服务器名字
      * @return 当前 dnsServer 的实例, 这个实例是 单例 的
      */
-    public static DefaultDnsServer getInstance(String serverName, IHostRepository hosts) {
+    public static DefaultDnsServer getInstance(String serverName, int port, IHostRepository hosts) {
         if (dnsServer == null) {
             synchronized (DefaultDnsServer.class) {
                 if (dnsServer == null) {
-                    dnsServer = new DefaultDnsServer(serverName, new ARecordHandler(hosts), new AAAARecordHandler());
+                    dnsServer = new DefaultDnsServer(serverName, port, new ARecordHandler(hosts), new AAAARecordHandler());
                 }
             }
         }

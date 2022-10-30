@@ -9,3 +9,7 @@ logging:
 mybatis-plus:
   global-config:
     banner: off
+dns:
+  port: 53
+  name: test
+  mode: bio

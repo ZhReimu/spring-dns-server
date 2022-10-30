@@ -20,9 +20,17 @@ public abstract class AbsDnsServer extends Thread {
 
     private static final Logger logger = LoggerFactory.getLogger(AbsDnsServer.class);
 
-    private static final String THREAD_NAME_SUFFIX = "-Thread-DnsServer";
+    private static final String THREAD_NAME_SUFFIX = "-DnsServer";
+
+    private static final int BUFF_SIZE = 1024;
 
     private Runnable r;
+
+    private final int port;
+
+    protected AbsDnsServer(int port) {
+        this.port = port;
+    }
 
     /**
      * 以 NIO 方式 启动 Dns 服务器
@@ -37,7 +45,7 @@ public abstract class AbsDnsServer extends Thread {
     @Override
     @SneakyThrows
     public void run() {
-        logger.debug("DNS 服务器已开启");
+        logger.debug("DNS 服务器已开启, 运行在端口: {}", port);
         r.run();
     }
 
@@ -49,10 +57,10 @@ public abstract class AbsDnsServer extends Thread {
     public void start(ServerMode mode) {
         if (ServerMode.BIO.equals(mode)) {
             r = this::bioRun;
-            setName("BIO" + THREAD_NAME_SUFFIX);
+            setName("bio" + THREAD_NAME_SUFFIX);
         } else {
             r = this::nioRun;
-            setName("NIO" + THREAD_NAME_SUFFIX);
+            setName("nio" + THREAD_NAME_SUFFIX);
         }
         super.start();
     }
@@ -62,10 +70,10 @@ public abstract class AbsDnsServer extends Thread {
      */
     @SneakyThrows
     private void bioRun() {
-        try (DatagramSocket socket = new DatagramSocket(53)) {
+        try (DatagramSocket socket = new DatagramSocket(port)) {
             while (true) {
-                byte[] buff = new byte[1024];
-                DatagramPacket packet = new DatagramPacket(buff, 0, 1024);
+                byte[] buff = new byte[BUFF_SIZE];
+                DatagramPacket packet = new DatagramPacket(buff, 0, BUFF_SIZE);
                 socket.receive(packet);
                 logger.trace("收到请求: {}", packet.getSocketAddress());
                 packet.setData(packetHandler(packet.getData()));
@@ -81,8 +89,8 @@ public abstract class AbsDnsServer extends Thread {
     private void nioRun() {
         try (DatagramChannel channel = DatagramChannel.open()) {
             channel.configureBlocking(false);
-            channel.bind(new InetSocketAddress(53));
-            ByteBuffer buffer = ByteBuffer.allocate(1024);
+            channel.bind(new InetSocketAddress(port));
+            ByteBuffer buffer = ByteBuffer.allocate(BUFF_SIZE);
             while (true) {
                 // 清空Buffer
                 buffer.clear();

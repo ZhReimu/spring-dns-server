@@ -16,7 +16,7 @@ public class Main {
 
     @SneakyThrows
     public static void main(String[] args) {
-        DefaultDnsServer dnsServer = DefaultDnsServer.getInstance("x-dns-server", HostsHashMap.getInstance());
+        DefaultDnsServer dnsServer = DefaultDnsServer.getInstance("x-dns-server", 53, HostsHashMap.getInstance());
         dnsServer.start(AbsDnsServer.ServerMode.BIO);
         logger.debug("程序已启动");
     }

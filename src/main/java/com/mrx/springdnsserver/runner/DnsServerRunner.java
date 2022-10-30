@@ -31,6 +31,7 @@ public class DnsServerRunner implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) {
+        DnsServerConfig.configHolder = serverConfig;
         DefaultDnsServer dnsServer = DefaultDnsServer.getInstance(
                 serverConfig.getName(), serverConfig.getPort(),
                 repository

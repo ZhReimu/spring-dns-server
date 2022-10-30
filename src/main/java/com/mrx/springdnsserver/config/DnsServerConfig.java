@@ -27,4 +27,11 @@ public class DnsServerConfig {
      */
     private AbsDnsServer.ServerMode mode = AbsDnsServer.ServerMode.BIO;
 
+    public static DnsServerConfig configHolder;
+
+    /**
+     * 当前最好的 CloudFlareIP
+     */
+    private String cfip = "172.67.186.61";
+
 }

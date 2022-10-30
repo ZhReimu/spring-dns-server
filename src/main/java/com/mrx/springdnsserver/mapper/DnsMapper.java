@@ -1,6 +1,8 @@
 package com.mrx.springdnsserver.mapper;
 
 import com.mrx.dns.util.IHostRepository;
+import com.mrx.dns.util.NetworkUtil;
+import com.mrx.springdnsserver.config.DnsServerConfig;
 import com.mrx.springdnsserver.model.Dns;
 import com.mrx.springdnsserver.model.Host;
 import org.apache.ibatis.annotations.*;
@@ -31,7 +33,9 @@ public interface DnsMapper extends IHostRepository {
             String gHost = host.getHost();
             gHost = gHost.startsWith("*.") ? gHost.replace("*.", "") :
                     gHost.replace("*", "");
-            if (nKey.endsWith(gHost)) return getIpsByHostId(host.getId());
+            if (nKey.endsWith(gHost)) {
+                return ipChecker(getIpsByHostId(host.getId()));
+            }
         }
         // 普通域名解析
         List<String> hosts = getIPsByHost(nKey);
@@ -44,9 +48,10 @@ public interface DnsMapper extends IHostRepository {
                     List<String> res = Arrays.stream(InetAddress.getAllByName(nKey))
                             .map(InetAddress::getHostAddress)
                             .collect(Collectors.toList());
+                    // 递归解析后, 将解析结果存入数据库
                     if (addHost(host)) {
                         logger.debug("插入 host 记录成功");
-                        Dns dns = new Dns().setHostId(host.getId()).setIps(res);
+                        Dns dns = new Dns(host.getId(), ipChecker(res));
                         if (addDns(dns)) {
                             logger.debug("插入 dns 记录成功");
                         } else {
@@ -56,7 +61,7 @@ public interface DnsMapper extends IHostRepository {
                         logger.debug("插入 host 记录失败: {}", host);
                     }
                     logger.debug("本次解析结果已缓存");
-                    return res;
+                    return ipChecker(res);
                 });
             } catch (Exception e) {
                 logger.warn("调用系统 dns 出错:", e);
@@ -64,7 +69,24 @@ public interface DnsMapper extends IHostRepository {
                 hosts = Collections.emptyList();
             }
         }
-        return hosts;
+        return ipChecker(hosts);
+    }
+
+    /**
+     * 检测 ips 中的 ip 是否为 cloudflare ip, 如果是, 那就将其替换为 当前设置的最优 cloudflare ip {@link DnsServerConfig#getCfip()}<br/>
+     * 若不是, 那就返回参数中的 ips
+     *
+     * @param ips 要检测的 ip
+     * @return 检测完毕的 ip
+     */
+    default List<String> ipChecker(List<String> ips) {
+        Logger logger = LoggerFactory.getLogger(DnsMapper.class);
+        List<String> cfIP = List.of(DnsServerConfig.configHolder.getCfip());
+        if (ips.stream().anyMatch(NetworkUtil::isInCFips)) {
+            logger.debug("检测到 cloud-flare ip, 自动替换为当前设置的 最优 ip: {}", cfIP);
+            return cfIP;
+        }
+        return ips;
     }
 
     @Select("SELECT id,host FROM tb_host WHERE host LIKE '%*%'")

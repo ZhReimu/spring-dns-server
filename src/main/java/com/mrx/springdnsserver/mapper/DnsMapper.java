@@ -4,8 +4,14 @@ import com.mrx.dns.util.IHostRepository;
 import com.mrx.springdnsserver.model.Dns;
 import com.mrx.springdnsserver.model.Host;
 import org.apache.ibatis.annotations.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.net.InetAddress;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author Mr.X
@@ -31,8 +37,38 @@ public interface DnsMapper extends IHostRepository {
 
     @Override
     default List<String> get(String key) {
+        Logger logger = LoggerFactory.getLogger(DnsMapper.class);
         String nKey = key.substring(0, key.length() - 1);
-        return getIPsByHost(nKey);
+        List<String> hosts = getIPsByHost(nKey);
+        if (hosts == null || hosts.isEmpty()) {
+            try {
+                logger.warn("开始递归解析: {}", nKey);
+                // 如果没有手动指定 hosts, 那就尝试调用系统 dns 的结果
+                return runMeasure(() -> {
+                    List<String> res = Arrays.stream(InetAddress.getAllByName(nKey))
+                            .map(InetAddress::getHostAddress)
+                            .collect(Collectors.toList());
+                    Host host = new Host().setHost(nKey);
+                    if (addHost(host)) {
+                        logger.debug("插入 host 记录成功");
+                        Dns dns = new Dns().setHostId(host.getId()).setIps(res);
+                        if (addDns(dns)) {
+                            logger.debug("插入 dns 记录成功");
+                        } else {
+                            logger.warn("插入 dns 记录失败: {}", dns);
+                        }
+                    } else {
+                        logger.debug("插入 host 记录失败: {}", host);
+                    }
+                    logger.debug("本次解析结果已缓存");
+                    return res;
+                });
+            } catch (Exception e) {
+                logger.warn("调用系统 dns 出错:", e);
+                hosts = Collections.emptyList();
+            }
+        }
+        return hosts;
     }
 
 }

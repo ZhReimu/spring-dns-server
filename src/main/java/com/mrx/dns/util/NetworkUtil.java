@@ -1,5 +1,8 @@
 package com.mrx.dns.util;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.List;
 
 /**
@@ -7,6 +10,8 @@ import java.util.List;
  * @since 2022-10-30 21:22
  */
 public class NetworkUtil {
+
+    private static final Logger logger = LoggerFactory.getLogger(NetworkUtil.class);
 
     private static final List<String> CF_IPS = List.of(
             "173.245.48.0/20",
@@ -27,20 +32,25 @@ public class NetworkUtil {
     );
 
     public static boolean isInRange(String ip, String cidr) {
-        String[] ips = ip.split("\\.");
-        int ipAddr = (Integer.parseInt(ips[0]) << 24)
-                | (Integer.parseInt(ips[1]) << 16)
-                | (Integer.parseInt(ips[2]) << 8) | Integer.parseInt(ips[3]);
-        int type = Integer.parseInt(cidr.replaceAll(".*/", ""));
-        int mask = 0xFFFFFFFF << (32 - type);
-        String cidrIp = cidr.replaceAll("/.*", "");
-        String[] cidrIps = cidrIp.split("\\.");
-        int cidrIpAddr = (Integer.parseInt(cidrIps[0]) << 24)
-                | (Integer.parseInt(cidrIps[1]) << 16)
-                | (Integer.parseInt(cidrIps[2]) << 8)
-                | Integer.parseInt(cidrIps[3]);
+        try {
+            String[] ips = ip.split("\\.");
+            int ipAddr = (Integer.parseInt(ips[0]) << 24)
+                    | (Integer.parseInt(ips[1]) << 16)
+                    | (Integer.parseInt(ips[2]) << 8) | Integer.parseInt(ips[3]);
+            int type = Integer.parseInt(cidr.replaceAll(".*/", ""));
+            int mask = 0xFFFFFFFF << (32 - type);
+            String cidrIp = cidr.replaceAll("/.*", "");
+            String[] cidrIps = cidrIp.split("\\.");
+            int cidrIpAddr = (Integer.parseInt(cidrIps[0]) << 24)
+                    | (Integer.parseInt(cidrIps[1]) << 16)
+                    | (Integer.parseInt(cidrIps[2]) << 8)
+                    | Integer.parseInt(cidrIps[3]);
 
-        return (ipAddr & mask) == (cidrIpAddr & mask);
+            return (ipAddr & mask) == (cidrIpAddr & mask);
+        } catch (Exception e) {
+            logger.warn("出现异常:", e);
+        }
+        return false;
     }
 
     public static boolean isInCFips(String ip) {

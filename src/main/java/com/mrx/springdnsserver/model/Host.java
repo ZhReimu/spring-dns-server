@@ -21,4 +21,8 @@ public class Host {
         this.host = host;
     }
 
+    public static Host of(String host) {
+        return new Host(host);
+    }
+
 }

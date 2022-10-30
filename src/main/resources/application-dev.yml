@@ -8,11 +8,11 @@ logging:
     com.mrx: debug
   file:
     path: log
-mybatis-plus:
-  global-config:
-    banner: off
 dns:
   port: 53
   name: test
   mode: bio
   cfip: 172.67.186.61
+mybatis:
+  type-aliases-package: com.mrx.springdnsserver.model
+  mapper-locations: classpath:mapper/*.xml, com.mrx.springdnsserver.mapper/*

@@ -5,6 +5,7 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 import java.util.List;
+import java.util.function.BiConsumer;
 
 /**
  * @author Mr.X
@@ -24,6 +25,18 @@ public class Dns {
     public Dns(Integer hostId, List<String> ips) {
         this.hostId = hostId;
         this.ips = ips;
+    }
+
+    public Dns(Host host, List<String> ip) {
+        this(host.getId(), ip);
+    }
+
+    public static Dns of(Host host, List<String> ip) {
+        return new Dns(host, ip);
+    }
+
+    public void forEach(BiConsumer<Integer, String> consumer) {
+        for (String ip : ips) consumer.accept(hostId, ip);
     }
 
 }

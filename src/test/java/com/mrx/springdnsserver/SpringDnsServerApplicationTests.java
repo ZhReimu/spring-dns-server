@@ -32,6 +32,8 @@ class SpringDnsServerApplicationTests {
         dns.setHostId(host.getId());
         dns.setIps(List.of("1.1.1.1", "2.2.2.2"));
         dnsMapper.addDns(dns);
+        dns.setIps(List.of("6.6.6.6", "7.7.7.7"));
+        dns.forEach((hostId, ip) -> dnsMapper.updateDns(hostId, ip));
     }
 
 }

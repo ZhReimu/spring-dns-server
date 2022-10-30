@@ -49,16 +49,8 @@ public interface DnsMapper extends IHostRepository {
                             .map(InetAddress::getHostAddress)
                             .collect(Collectors.toList());
                     // 递归解析后, 将解析结果存入数据库
-                    if (addHost(host)) {
-                        logger.debug("插入 host 记录成功");
-                        Dns dns = new Dns(host.getId(), ipChecker(res));
-                        if (addDns(dns)) {
-                            logger.debug("插入 dns 记录成功");
-                        } else {
-                            logger.warn("插入 dns 记录失败: {}", dns);
-                        }
-                    } else {
-                        logger.debug("插入 host 记录失败: {}", host);
+                    if (addHostAndDns(host, ipChecker(res))) {
+                        logger.debug("插入 host 与 dns 记录成功");
                     }
                     logger.debug("本次解析结果已缓存");
                     return ipChecker(res);
@@ -96,18 +88,29 @@ public interface DnsMapper extends IHostRepository {
     @Options(useGeneratedKeys = true, keyProperty = "id", keyColumn = "id")
     Boolean addHost(Host host);
 
-    @Insert("<script> " +
-            "INSERT INTO tb_dns(host_id, ip) VALUES " +
-            "<foreach collection=\"ips\" item=\"ip\" separator=\",\" > " +
-            "        (#{hostId},#{ip})" +
-            " </foreach>" +
-            "</script>")
+    default Boolean addHostAndDns(Host host, List<String> ips) {
+        return addHost(host) && addDns(Dns.of(host, ips));
+    }
+
     Boolean addDns(Dns dns);
+
+    /**
+     * 通过 hostId 更新 dns, 目前的行为会将该 hostId 下的所有 ip 全部更新为一样的 ip
+     *
+     * @param hostId hostId
+     * @param ip     更新后的 ip
+     * @return 更新结果
+     */
+    @Update("UPDATE tb_dns SET ip = ip WHERE host_id = #{hostId}")
+    Boolean updateDns(@Param("hostId") Integer hostId, @Param("ip") String ip);
 
     @Insert("INSERT INTO tb_host_error(host) VALUES (#{host})")
     void addErrorHost(Host host);
 
     @Select("SELECT ip FROM tb_dns WHERE host_id = #{hostId}")
     List<String> getIpsByHostId(@Param("hostId") Integer hostId);
+
+    @Select("SELECT * FROM tb_host WHERE host = #{host}")
+    Host checkHostExists(@Param("host") String host);
 
 }

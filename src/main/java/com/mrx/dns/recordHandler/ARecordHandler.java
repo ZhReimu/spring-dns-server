@@ -1,7 +1,7 @@
 package com.mrx.dns.recordHandler;
 
 import com.mrx.dns.RecordUtil;
-import com.mrx.dns.util.HostsHashMap;
+import com.mrx.dns.util.IHostRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xbill.DNS.*;
@@ -16,7 +16,11 @@ public class ARecordHandler implements IRecordHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(ARecordHandler.class);
 
-    private static final HostsHashMap hosts = HostsHashMap.getInstance();
+    private final IHostRepository hosts;
+
+    public ARecordHandler(IHostRepository hosts) {
+        this.hosts = hosts;
+    }
 
     @Override
     public boolean handleQuestion(Message message) {

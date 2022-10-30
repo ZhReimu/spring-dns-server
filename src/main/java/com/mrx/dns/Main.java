@@ -1,6 +1,7 @@
 package com.mrx.dns;
 
 import com.mrx.dns.recordHandler.DefaultDnsServer;
+import com.mrx.dns.util.HostsHashMap;
 import lombok.SneakyThrows;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,7 +16,7 @@ public class Main {
 
     @SneakyThrows
     public static void main(String[] args) {
-        DefaultDnsServer dnsServer = DefaultDnsServer.getInstance("x-dns-server");
+        DefaultDnsServer dnsServer = DefaultDnsServer.getInstance("x-dns-server", HostsHashMap.getInstance());
         dnsServer.start(AbsDnsServer.ServerMode.BIO);
         logger.debug("程序已启动");
     }

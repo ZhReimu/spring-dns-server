@@ -1,9 +1,9 @@
 package com.mrx.springdnsserver.mapper;
 
+import com.mrx.dns.util.IHostRepository;
 import com.mrx.springdnsserver.model.Dns;
 import com.mrx.springdnsserver.model.Host;
 import org.apache.ibatis.annotations.*;
-import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -12,7 +12,7 @@ import java.util.List;
  * @since 2022-10-30 16:27
  */
 @Mapper
-public interface DnsMapper {
+public interface DnsMapper extends IHostRepository {
 
     @Select("SELECT ip FROM tb_dns WHERE host_id = (SELECT id FROM tb_host WHERE host = #{host})")
     List<String> getIPsByHost(@Param("host") String host);
@@ -28,5 +28,11 @@ public interface DnsMapper {
             " </foreach>" +
             "</script>")
     Boolean addDns(Dns dns);
+
+    @Override
+    default List<String> get(String key) {
+        String nKey = key.substring(0, key.length() - 1);
+        return getIPsByHost(nKey);
+    }
 
 }

@@ -136,10 +136,6 @@ public interface DnsMapper extends IHostRepository {
         return ips;
     }
 
-    @SuppressWarnings("unused") // mapper.xml 里用到了
-    @Select("SELECT ip FROM tb_generic_dns WHERE host_id = #{hostId}")
-    List<String> getGHostIpsByGHost(@Param("hostId") Integer hostId);
-
     void insertLogBatch(@Param("resolveLog") List<String> resolveLog);
 
     @Insert("INSERT INTO tb_host_error(host) VALUES (#{host})")

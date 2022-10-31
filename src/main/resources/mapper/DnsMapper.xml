@@ -8,8 +8,7 @@
         <result column="host" property="host"/>
         <!-- 一对多的关系 -->
         <!-- property: 指的是集合属性的值,对应类中的属性名 ofType：指的是集合中元素的类型 -->
-        <collection property="ips" column="id" ofType="String"
-                    select="com.mrx.springdnsserver.mapper.DnsMapper.getIpsByHostId">
+        <collection property="ips" column="id" ofType="String" select="getIpsByHostId">
             <result column="ip"/>
         </collection>
     </resultMap>
@@ -19,8 +18,7 @@
         <result column="host" property="host"/>
         <!-- 一对多的关系 -->
         <!-- property: 指的是集合属性的值,对应类中的属性名 ofType：指的是集合中元素的类型 -->
-        <collection property="ips" column="id" ofType="String"
-                    select="com.mrx.springdnsserver.mapper.DnsMapper.getGHostIpsByGHost">
+        <collection property="ips" column="id" ofType="String" select="getGHostIpsByGHost">
             <result column="ip"/>
         </collection>
     </resultMap>
@@ -49,6 +47,18 @@
         SELECT id, host
         FROM tb_generic_host
         WHERE INSTR(#{host}, SUBSTRING(host, 3, LENGTH(host))) > 0
+    </select>
+
+    <select id="getGHostIpsByGHost" resultType="String">
+        SELECT ip
+        FROM tb_generic_dns
+        WHERE host_id = #{hostId}
+    </select>
+
+    <select id="getIpsByHostId" resultType="String">
+        SELECT ip
+        FROM tb_dns
+        WHERE host_id = #{hostId}
     </select>
 
 </mapper>

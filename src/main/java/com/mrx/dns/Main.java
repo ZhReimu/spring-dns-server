@@ -1,7 +1,7 @@
 package com.mrx.dns;
 
 import com.mrx.dns.recordHandler.DefaultDnsServer;
-import com.mrx.dns.util.HostsHashMap;
+import com.mrx.dns.repository.HostsHashMap;
 import lombok.SneakyThrows;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

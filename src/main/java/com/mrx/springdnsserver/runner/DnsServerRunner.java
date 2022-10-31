@@ -1,7 +1,7 @@
 package com.mrx.springdnsserver.runner;
 
 import com.mrx.dns.recordHandler.DefaultDnsServer;
-import com.mrx.dns.util.IHostRepository;
+import com.mrx.dns.repository.IHostRepository;
 import com.mrx.springdnsserver.config.DnsServerConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;

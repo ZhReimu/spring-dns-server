@@ -2,7 +2,7 @@ package com.mrx.dns.recordHandler;
 
 import com.mrx.dns.AbsDnsServer;
 import com.mrx.dns.RecordUtil;
-import com.mrx.dns.util.IHostRepository;
+import com.mrx.dns.repository.IHostRepository;
 import lombok.SneakyThrows;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

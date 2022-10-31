@@ -1,4 +1,4 @@
-package com.mrx.dns.util;
+package com.mrx.dns.repository;
 
 import com.alibaba.fastjson2.JSON;
 import org.slf4j.Logger;

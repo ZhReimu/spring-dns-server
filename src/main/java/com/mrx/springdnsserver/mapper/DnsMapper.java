@@ -1,7 +1,7 @@
 package com.mrx.springdnsserver.mapper;
 
-import com.mrx.dns.util.HostsMap;
-import com.mrx.dns.util.IHostRepository;
+import com.mrx.dns.repository.HostsMap;
+import com.mrx.dns.repository.IHostRepository;
 import com.mrx.dns.util.NetworkUtil;
 import com.mrx.springdnsserver.model.dns.Dns;
 import com.mrx.springdnsserver.model.dns.DnsRecord;

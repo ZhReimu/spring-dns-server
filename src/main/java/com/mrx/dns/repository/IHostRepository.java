@@ -1,4 +1,4 @@
-package com.mrx.dns.util;
+package com.mrx.dns.repository;
 
 import lombok.SneakyThrows;
 

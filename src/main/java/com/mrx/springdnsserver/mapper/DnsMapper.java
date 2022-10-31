@@ -38,17 +38,16 @@ public interface DnsMapper extends IHostRepository {
 
     DnsRecord getDnsRecordByHost(String host);
 
-    /*-----泛域名相关操作 end ------*/
     @Override
     default List<String> getIpsByHost(String nKey) {
         Logger logger = LoggerFactory.getLogger(DnsMapper.class);
         // 记录 解析日志
         // Optional.ofNullable(checkHostExists(nKey)).ifPresent(this::insertLog);
         // 实现 泛域名解析
-        Host gHost = getGHostByHost(nKey);
-        if (gHost != null) {
-            logger.info("检测到泛域名: {} -> {}", nKey, gHost.getHost());
-            return ipChecker(getIpsByGHostId(gHost.getId()));
+        DnsRecord gDnsRecord = getGDnsRecord(nKey);
+        if (gDnsRecord != null) {
+            logger.info("检测到泛域名: {} -> {}", nKey, gDnsRecord.getHost());
+            return ipChecker(gDnsRecord.getIps());
         }
         // 普通域名解析
         List<String> hosts = getIPsByHost(nKey);
@@ -75,9 +74,7 @@ public interface DnsMapper extends IHostRepository {
         return ipChecker(hosts);
     }
 
-    /*-----泛域名相关操作 start ------*/
-    @Select("SELECT * FROM tb_generic_host WHERE INSTR(#{host},SUBSTRING(host, 3, LENGTH(host))) > 0")
-    Host getGHostByHost(@Param("host") String host);
+    DnsRecord getGDnsRecord(@Param("host") String host);
 
     /**
      * 检测 ips 中的 ip 是否为 cloudflare ip, 如果是, 那就将其替换为 当前设置的最优 cloudflare ip {@link DnsServerConfig#getCfip()}<br/>
@@ -96,8 +93,9 @@ public interface DnsMapper extends IHostRepository {
         return ips;
     }
 
+    @SuppressWarnings("unused") // mapper.xml 里用到了
     @Select("SELECT ip FROM tb_generic_dns WHERE host_id = #{hostId}")
-    List<String> getIpsByGHostId(@Param("hostId") Integer hostId);
+    List<String> getGHostIpsByGHost(@Param("hostId") Integer hostId);
 
     /**
      * 向数据库添加 host 和 dns

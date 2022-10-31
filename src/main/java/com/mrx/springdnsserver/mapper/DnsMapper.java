@@ -67,11 +67,11 @@ public interface DnsMapper extends IHostRepository, IResolver {
             Map<String, Integer> logCache = new HashMap<>();
             for (ResolveLog log : resolveLog) {
                 Integer ipId = Optional.ofNullable(logCache.get(log.getIp())).orElseGet(() -> {
-                    LogIp logIp = getResolveIpByIp(log.getIp());
-                    if (logIp == null) {
-                        logIp = LogIp.of(log.getIp());
-                        insertResolveIp(logIp);
-                    }
+                    LogIp logIp = Optional.ofNullable(getResolveIpByIp(log.getIp())).orElseGet(() -> {
+                        LogIp t = LogIp.of(log.getIp());
+                        insertResolveIp(t);
+                        return t;
+                    });
                     logCache.put(logIp.getIp(), logIp.getId());
                     return logIp.getId();
                 });

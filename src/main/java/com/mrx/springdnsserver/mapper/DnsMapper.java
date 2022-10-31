@@ -3,10 +3,7 @@ package com.mrx.springdnsserver.mapper;
 import com.mrx.dns.repository.IHostRepository;
 import com.mrx.dns.resolver.IResolver;
 import com.mrx.dns.util.NetworkUtil;
-import com.mrx.springdnsserver.model.dns.Dns;
-import com.mrx.springdnsserver.model.dns.DnsRecord;
-import com.mrx.springdnsserver.model.dns.Host;
-import com.mrx.springdnsserver.model.dns.ResolveLog;
+import com.mrx.springdnsserver.model.dns.*;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.slf4j.Logger;
@@ -15,10 +12,7 @@ import org.springframework.util.CollectionUtils;
 
 import java.net.Inet4Address;
 import java.net.InetAddress;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.mrx.dns.util.NetworkUtil.ipChecker;
@@ -65,8 +59,24 @@ public interface DnsMapper extends IHostRepository, IResolver {
      */
     Integer countResolveByPeriod(@Param("start") Integer start, @Param("end") Integer end);
 
+    /**
+     * 保存解析日志, 需要在子线程执行, 以免影响性能
+     */
     default void saveLog() {
         runMeasure(() -> {
+            Map<String, Integer> logCache = new HashMap<>();
+            for (ResolveLog log : resolveLog) {
+                Integer ipId = Optional.ofNullable(logCache.get(log.getIp())).orElseGet(() -> {
+                    LogIp logIp = getResolveIpByIp(log.getIp());
+                    if (logIp == null) {
+                        logIp = LogIp.of(log.getIp());
+                        insertResolveIp(logIp);
+                    }
+                    logCache.put(logIp.getIp(), logIp.getId());
+                    return logIp.getId();
+                });
+                log.setIpId(ipId);
+            }
             insertLogBatch(resolveLog);
             synchronized (resolveLog) {
                 resolveLog.clear();
@@ -134,6 +144,10 @@ public interface DnsMapper extends IHostRepository, IResolver {
     void insertLogBatch(@Param("resolveLog") List<ResolveLog> resolveLog);
 
     void addErrorHost(Host host);
+
+    LogIp getResolveIpByIp(@Param("ip") String ip);
+
+    void insertResolveIp(LogIp logIp);
 
     Host getHostFromDB(@Param("host") String host);
 

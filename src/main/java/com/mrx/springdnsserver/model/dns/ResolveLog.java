@@ -17,6 +17,8 @@ public class ResolveLog {
 
     private String ip;
 
+    private Integer ipId;
+
     private Long createTime;
 
     public ResolveLog(String host, String ip) {

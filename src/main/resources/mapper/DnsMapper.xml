@@ -31,9 +31,9 @@
     </insert>
 
     <insert id="insertLogBatch">
-        INSERT INTO tb_resolve_log(host,ip) VALUES
+        INSERT INTO tb_resolve_log(host,ip_id) VALUES
         <foreach collection="resolveLog" item="host" separator=",">
-            (#{host.host},#{host.ip})
+            (#{host.host},#{host.ipId})
         </foreach>
     </insert>
 
@@ -45,6 +45,11 @@
     <insert id="addHost" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
         INSERT INTO tb_host(host)
         VALUES (#{host})
+    </insert>
+
+    <insert id="insertResolveIp" useGeneratedKeys="true" keyColumn="id" keyProperty="id">
+        INSERT INTO tb_resolve_log_ip(ip)
+        VALUES (#{ip})
     </insert>
 
     <update id="updateDns">
@@ -97,6 +102,12 @@
         WHERE createTime
                   BETWEEN DATETIME(STRFTIME('%s', 'now') - 60 * #{start}, 'unixepoch', 'localtime')
                   AND DATETIME(STRFTIME('%s', 'now') - 60 * #{end}, 'unixepoch', 'localtime')
+    </select>
+
+    <select id="getResolveIpByIp" resultType="LogIp">
+        SELECT id, ip
+        FROM tb_resolve_log_ip
+        WHERE ip = #{ip}
     </select>
 
 </mapper>

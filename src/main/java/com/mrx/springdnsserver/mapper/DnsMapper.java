@@ -64,10 +64,7 @@ public interface DnsMapper extends IHostRepository {
                         .map(this::ipChecker)
                         .collect(Collectors.toList());
                 // 递归解析后, 将解析结果存入数据库
-                if (addHostAndDns(host, res)) {
-                    logger.info("插入 host 与 dns 记录成功");
-                }
-                logger.info("本次解析结果已缓存");
+                if (addHostAndDns(host, res)) logger.info("插入 host 与 dns 记录成功, 本次解析结果已缓存");
                 return res;
             } catch (Exception e) {
                 logger.warn("调用系统 dns 出错: {} -> {}", e.getLocalizedMessage(), e.getClass().getName());

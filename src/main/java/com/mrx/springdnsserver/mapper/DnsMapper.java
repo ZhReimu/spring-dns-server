@@ -10,6 +10,7 @@ import org.apache.ibatis.annotations.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.util.Arrays;
 import java.util.Collections;
@@ -22,6 +23,8 @@ import java.util.stream.Collectors;
  */
 @Mapper
 public interface DnsMapper extends IHostRepository {
+
+    Logger logger = LoggerFactory.getLogger(DnsMapper.class);
 
     @Select("SELECT ip FROM tb_dns WHERE host_id = (SELECT id FROM tb_host WHERE host = #{host})")
     List<String> getIPsByHost(@Param("host") String host);
@@ -40,7 +43,6 @@ public interface DnsMapper extends IHostRepository {
 
     @Override
     default List<String> getIpsByHost(String nKey) {
-        Logger logger = LoggerFactory.getLogger(DnsMapper.class);
         // 记录 解析日志
         // Optional.ofNullable(checkHostExists(nKey)).ifPresent(this::insertLog);
         // 实现 泛域名解析
@@ -55,16 +57,18 @@ public interface DnsMapper extends IHostRepository {
             Host host = new Host(nKey);
             try {
                 logger.info("开始递归解析: {}", nKey);
-                // 如果没有手动指定 hosts, 那就尝试调用系统 dns 的结果
+                // 如果没有手动指定 hosts, 那就尝试调用系统 dns 的结果, 只需要 ipv4 的结果
                 List<String> res = Arrays.stream(InetAddress.getAllByName(nKey))
+                        .filter(it -> it instanceof Inet4Address)
                         .map(InetAddress::getHostAddress)
+                        .map(this::ipChecker)
                         .collect(Collectors.toList());
                 // 递归解析后, 将解析结果存入数据库
-                if (addHostAndDns(host, ipChecker(res))) {
+                if (addHostAndDns(host, res)) {
                     logger.info("插入 host 与 dns 记录成功");
                 }
                 logger.info("本次解析结果已缓存");
-                return ipChecker(res);
+                return res;
             } catch (Exception e) {
                 logger.warn("调用系统 dns 出错: {} -> {}", e.getLocalizedMessage(), e.getClass().getName());
                 addErrorHost(host);
@@ -75,6 +79,15 @@ public interface DnsMapper extends IHostRepository {
     }
 
     DnsRecord getGDnsRecord(@Param("host") String host);
+
+    default String ipChecker(String ip) {
+        String cfIP = DnsServerConfig.configHolder.getCfip();
+        if (NetworkUtil.isInCFips(ip)) {
+            logger.info("检测到 cloud-flare ip, 自动替换为当前设置的 最优 ip: {}", cfIP);
+            return cfIP;
+        }
+        return ip;
+    }
 
     /**
      * 检测 ips 中的 ip 是否为 cloudflare ip, 如果是, 那就将其替换为 当前设置的最优 cloudflare ip {@link DnsServerConfig#getCfip()}<br/>

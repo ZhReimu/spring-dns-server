@@ -91,4 +91,12 @@
         WHERE host_id = #{hostId}
     </select>
 
+    <select id="countResolveByPeriod" resultType="java.lang.Integer">
+        SELECT COUNT(*) AS resolveCount
+        FROM tb_resolve_log
+        WHERE createTime
+                  BETWEEN DATETIME(STRFTIME('%s', 'now') - 60 * #{start}, 'unixepoch', 'localtime')
+                  AND DATETIME(STRFTIME('%s', 'now') - 60 * #{end}, 'unixepoch', 'localtime')
+    </select>
+
 </mapper>

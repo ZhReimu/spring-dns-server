@@ -22,6 +22,11 @@ class SpringDnsServerApplicationTests {
     private DnsMapper dnsMapper;
 
     @Test
+    void countResolveTest() {
+        logger.debug("一小时内的解析数量: {}", dnsMapper.countResolveByInterval(60, 10));
+    }
+
+    @Test
     void dnsMapperTest() {
         logger.debug("getIpsByHost: {}", dnsMapper.getIPsByHost("test.com"));
         Host host = new Host();

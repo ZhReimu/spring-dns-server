@@ -47,6 +47,23 @@ public interface DnsMapper extends IHostRepository, IResolver {
 
     DnsRecord getDnsRecordByHost(String host);
 
+    default List<Integer> countResolveByInterval(int interval, int step) {
+        List<Integer> res = new ArrayList<>();
+        for (int i = 0; i < interval; i += step) {
+            res.add(countResolveByPeriod(i + step, i));
+        }
+        return res;
+    }
+
+    /**
+     * 统计 start 分钟前 到 end 分钟之间的解析数量
+     *
+     * @param start start 分钟前
+     * @param end   end 分钟止
+     * @return 这个时间段的解析数量
+     */
+    Integer countResolveByPeriod(@Param("start") Integer start, @Param("end") Integer end);
+
     default void saveLog() {
         runMeasure(() -> {
             insertLogBatch(resolveLog);

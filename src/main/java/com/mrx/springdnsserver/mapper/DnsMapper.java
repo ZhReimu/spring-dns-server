@@ -9,6 +9,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.CollectionUtils;
 
 import java.net.Inet4Address;
 import java.net.InetAddress;
@@ -67,19 +68,19 @@ public interface DnsMapper extends IHostRepository {
         }
         // 普通域名解析
         List<String> hosts = getIPsByHost(nKey);
-        if (hosts == null || hosts.isEmpty()) {
+        if (CollectionUtils.isEmpty(hosts)) {
             Host host = new Host(nKey);
             try {
                 logger.info("开始递归解析: {}", nKey);
                 // 如果没有手动指定 hosts, 那就尝试调用系统 dns 的结果, 只需要 ipv4 的结果
-                List<String> res = Arrays.stream(InetAddress.getAllByName(nKey))
+                hosts = Arrays.stream(InetAddress.getAllByName(nKey))
                         .filter(it -> it instanceof Inet4Address)
                         .map(InetAddress::getHostAddress)
                         .map(NetworkUtil::ipChecker)
                         .collect(Collectors.toList());
                 // 递归解析后, 将解析结果存入数据库
-                if (addHostAndDns(host, res)) logger.info("插入 host 与 dns 记录成功, 本次解析结果已缓存");
-                return res;
+                if (addHostAndDns(host, hosts)) logger.info("插入 host 与 dns 记录成功, 本次解析结果已缓存");
+                return hosts;
             } catch (Exception e) {
                 logger.warn("调用系统 dns 出错: {} -> {}", e.getLocalizedMessage(), e.getClass().getName());
                 addErrorHost(host);

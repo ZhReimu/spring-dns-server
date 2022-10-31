@@ -2,7 +2,7 @@ package com.mrx.dns.recordHandler;
 
 import com.mrx.dns.AbsDnsServer;
 import com.mrx.dns.RecordUtil;
-import com.mrx.dns.repository.IHostRepository;
+import com.mrx.dns.resolver.Resolver;
 import lombok.SneakyThrows;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,11 +65,11 @@ public class DefaultDnsServer extends AbsDnsServer {
      * @param serverName 服务器名字
      * @return 当前 dnsServer 的实例, 这个实例是 单例 的
      */
-    public static DefaultDnsServer getInstance(String serverName, int port, IHostRepository hosts) {
+    public static DefaultDnsServer getInstance(String serverName, int port, Resolver resolver) {
         if (dnsServer == null) {
             synchronized (DefaultDnsServer.class) {
                 if (dnsServer == null) {
-                    dnsServer = new DefaultDnsServer(serverName, port, new ARecordHandler(hosts), new AAAARecordHandler());
+                    dnsServer = new DefaultDnsServer(serverName, port, new ARecordHandler(resolver), new AAAARecordHandler());
                 }
             }
         }

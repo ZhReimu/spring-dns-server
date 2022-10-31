@@ -1,7 +1,9 @@
 package com.mrx.springdnsserver.runner;
 
 import com.mrx.dns.recordHandler.DefaultDnsServer;
-import com.mrx.dns.repository.IHostRepository;
+import com.mrx.dns.resolver.IResolver;
+import com.mrx.dns.resolver.JsonHostResolver;
+import com.mrx.dns.resolver.Resolver;
 import com.mrx.springdnsserver.config.DnsServerConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
@@ -15,12 +17,12 @@ import org.springframework.stereotype.Component;
 @Component
 public class DnsServerRunner implements ApplicationRunner {
 
-    private IHostRepository repository;
+    private IResolver repository;
 
     private DnsServerConfig serverConfig;
 
     @Autowired
-    public void setRepository(IHostRepository repository) {
+    public void setRepository(IResolver repository) {
         this.repository = repository;
     }
 
@@ -34,7 +36,7 @@ public class DnsServerRunner implements ApplicationRunner {
         DnsServerConfig.configHolder = serverConfig;
         DefaultDnsServer dnsServer = DefaultDnsServer.getInstance(
                 serverConfig.getName(), serverConfig.getPort(),
-                repository
+                Resolver.getInstance(JsonHostResolver.getInstance(), repository)
         );
         dnsServer.start(serverConfig.getMode());
     }

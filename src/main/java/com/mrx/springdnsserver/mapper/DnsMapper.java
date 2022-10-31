@@ -1,7 +1,7 @@
 package com.mrx.springdnsserver.mapper;
 
-import com.mrx.dns.repository.HostsMap;
 import com.mrx.dns.repository.IHostRepository;
+import com.mrx.dns.resolver.IResolver;
 import com.mrx.dns.util.NetworkUtil;
 import com.mrx.springdnsserver.model.dns.Dns;
 import com.mrx.springdnsserver.model.dns.DnsRecord;
@@ -28,13 +28,11 @@ import static com.mrx.dns.util.PerformanceUtil.runMeasure;
  * @since 2022-10-30 16:27
  */
 @Mapper
-public interface DnsMapper extends IHostRepository {
+public interface DnsMapper extends IHostRepository, IResolver {
 
     Logger logger = LoggerFactory.getLogger(DnsMapper.class);
 
     List<String> resolveLog = new ArrayList<>();
-
-    IHostRepository hostsMap = HostsMap.getInstance();
 
     List<String> getIPsByHost(@Param("host") String host);
 
@@ -64,9 +62,6 @@ public interface DnsMapper extends IHostRepository {
         synchronized (resolveLog) {
             resolveLog.add(nKey);
         }
-        // 优先使用 host.json 中的内容解析
-        List<String> hosts = hostsMap.getIpsByHost(nKey);
-        if (!CollectionUtils.isEmpty(hosts)) return hosts;
         // 实现 泛域名解析
         DnsRecord gDnsRecord = getGDnsRecord(nKey);
         if (gDnsRecord != null) {
@@ -74,7 +69,7 @@ public interface DnsMapper extends IHostRepository {
             return ipChecker(gDnsRecord.getIps());
         }
         // 普通域名解析
-        hosts = getIPsByHost(nKey);
+        List<String> hosts = getIPsByHost(nKey);
         if (CollectionUtils.isEmpty(hosts)) {
             Host host = new Host(nKey);
             try {

@@ -3,8 +3,9 @@ package com.mrx.springdnsserver.mapper;
 import com.mrx.dns.util.IHostRepository;
 import com.mrx.dns.util.NetworkUtil;
 import com.mrx.springdnsserver.config.DnsServerConfig;
-import com.mrx.springdnsserver.model.Dns;
-import com.mrx.springdnsserver.model.Host;
+import com.mrx.springdnsserver.model.dns.Dns;
+import com.mrx.springdnsserver.model.dns.DnsRecord;
+import com.mrx.springdnsserver.model.dns.Host;
 import org.apache.ibatis.annotations.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -112,5 +113,7 @@ public interface DnsMapper extends IHostRepository {
 
     @Select("SELECT * FROM tb_host WHERE host = #{host}")
     Host checkHostExists(@Param("host") String host);
+
+    DnsRecord getDnsRecordByHost(String host);
 
 }

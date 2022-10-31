@@ -1,8 +1,8 @@
 package com.mrx.springdnsserver.controller;
 
 import com.mrx.springdnsserver.mapper.DnsMapper;
-import com.mrx.springdnsserver.model.Dns;
-import com.mrx.springdnsserver.model.Host;
+import com.mrx.springdnsserver.model.dns.Dns;
+import com.mrx.springdnsserver.model.dns.Host;
 import com.mrx.springdnsserver.model.result.Result;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,6 +46,11 @@ public class DnsController {
         }
         // 若数据库中不存在 host 记录, 那就先插入 host 记录, 再 插入 dns 记录
         return mapper.addHostAndDns(Host.of(host), ip) ? Result.success() : Result.fail();
+    }
+
+    @GetMapping("/query")
+    public Result<?> queryDns(@RequestParam String host) {
+        return Result.success(mapper.getDnsRecordByHost(host));
     }
 
 }

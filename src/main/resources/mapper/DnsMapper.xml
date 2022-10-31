@@ -3,11 +3,28 @@
 
 <mapper namespace="com.mrx.springdnsserver.mapper.DnsMapper">
 
+    <resultMap id="DnsRecordResultMap" type="DnsRecord">
+        <id column="id" property="id"/>
+        <result column="host" property="host"/>
+        <!-- 一对多的关系 -->
+        <!-- property: 指的是集合属性的值,对应类中的属性名 ofType：指的是集合中元素的类型 -->
+        <collection property="ips" column="id" ofType="String"
+                    select="com.mrx.springdnsserver.mapper.DnsMapper.getIpsByHostId">
+            <result column="ip"/>
+        </collection>
+    </resultMap>
+
     <insert id="addDns">
         INSERT INTO tb_dns(host_id, ip) VALUES
         <foreach collection="ips" item="ip" separator=",">
             (#{hostId},#{ip})
         </foreach>
     </insert>
+
+    <select id="getDnsRecordByHost" resultMap="DnsRecordResultMap">
+        SELECT id, host
+        FROM tb_host
+        WHERE host = #{host,jdbcType=VARCHAR}
+    </select>
 
 </mapper>

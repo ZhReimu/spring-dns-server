@@ -1,4 +1,4 @@
-package com.mrx.springdnsserver.model;
+package com.mrx.springdnsserver.model.dns;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;

@@ -1,8 +1,8 @@
 package com.mrx.springdnsserver;
 
 import com.mrx.springdnsserver.mapper.DnsMapper;
-import com.mrx.springdnsserver.model.Dns;
-import com.mrx.springdnsserver.model.Host;
+import com.mrx.springdnsserver.model.dns.Dns;
+import com.mrx.springdnsserver.model.dns.Host;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

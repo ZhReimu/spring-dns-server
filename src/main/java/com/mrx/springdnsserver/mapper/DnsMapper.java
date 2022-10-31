@@ -2,7 +2,6 @@ package com.mrx.springdnsserver.mapper;
 
 import com.mrx.dns.util.IHostRepository;
 import com.mrx.dns.util.NetworkUtil;
-import com.mrx.springdnsserver.config.DnsServerConfig;
 import com.mrx.springdnsserver.model.dns.Dns;
 import com.mrx.springdnsserver.model.dns.DnsRecord;
 import com.mrx.springdnsserver.model.dns.Host;
@@ -18,6 +17,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static com.mrx.dns.util.NetworkUtil.ipChecker;
 
 /**
  * @author Mr.X
@@ -74,7 +75,7 @@ public interface DnsMapper extends IHostRepository {
                 List<String> res = Arrays.stream(InetAddress.getAllByName(nKey))
                         .filter(it -> it instanceof Inet4Address)
                         .map(InetAddress::getHostAddress)
-                        .map(this::ipChecker)
+                        .map(NetworkUtil::ipChecker)
                         .collect(Collectors.toList());
                 // 递归解析后, 将解析结果存入数据库
                 if (addHostAndDns(host, res)) logger.info("插入 host 与 dns 记录成功, 本次解析结果已缓存");
@@ -108,32 +109,6 @@ public interface DnsMapper extends IHostRepository {
     }
 
     DnsRecord getGDnsRecord(@Param("host") String host);
-
-    default String ipChecker(String ip) {
-        String cfIP = DnsServerConfig.configHolder.getCfip();
-        if (NetworkUtil.isInCFips(ip)) {
-            logger.info("检测到 cloud-flare ip, 自动替换为当前设置的 最优 ip: {}", cfIP);
-            return cfIP;
-        }
-        return ip;
-    }
-
-    /**
-     * 检测 ips 中的 ip 是否为 cloudflare ip, 如果是, 那就将其替换为 当前设置的最优 cloudflare ip {@link DnsServerConfig#getCfip()}<br/>
-     * 若不是, 那就返回参数中的 ips
-     *
-     * @param ips 要检测的 ip
-     * @return 检测完毕的 ip
-     */
-    default List<String> ipChecker(List<String> ips) {
-        Logger logger = LoggerFactory.getLogger(DnsMapper.class);
-        List<String> cfIP = List.of(DnsServerConfig.configHolder.getCfip());
-        if (ips.stream().anyMatch(NetworkUtil::isInCFips)) {
-            logger.info("检测到 cloud-flare ip, 自动替换为当前设置的 最优 ip: {}", cfIP);
-            return cfIP;
-        }
-        return ips;
-    }
 
     void insertLogBatch(@Param("resolveLog") List<String> resolveLog);
 

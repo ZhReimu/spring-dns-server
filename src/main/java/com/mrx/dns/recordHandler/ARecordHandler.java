@@ -23,9 +23,9 @@ public class ARecordHandler implements IRecordHandler {
     }
 
     @Override
-    public boolean handleQuestion(Message message) {
+    public boolean handleQuestion(Message message, String host) {
         Name name = message.getQuestion().getName();
-        List<String> answers = resolver.get(name.toString());
+        List<String> answers = resolver.get(name.toString(), host);
         logger.debug("解析域名: {} -> {}", name, answers);
         if (answers.isEmpty()) {
             // 如果 响应内容 为空, 那就返回 空响应

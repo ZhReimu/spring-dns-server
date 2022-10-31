@@ -26,9 +26,9 @@ public class Resolver implements IResolver {
     }
 
     @Override
-    public List<String> getIpsByHost(String host) {
+    public List<String> getIpsByHost(String host, String ip) {
         for (IResolver resolver : resolvers) {
-            List<String> hostList = resolver.getIpsByHost(host);
+            List<String> hostList = resolver.getIpsByHost(host, ip);
             if (!CollectionUtils.isEmpty(hostList)) return hostList;
         }
         return Collections.emptyList();

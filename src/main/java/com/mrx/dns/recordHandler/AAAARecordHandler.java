@@ -15,7 +15,7 @@ public class AAAARecordHandler implements IRecordHandler {
     private static final Logger logger = LoggerFactory.getLogger(AAAARecordHandler.class);
 
     @Override
-    public boolean handleQuestion(Message message) {
+    public boolean handleQuestion(Message message, String host) {
         // 暂不支持 ipv6, 直接返回 空响应
         RecordUtil.clearRecord(message);
         logger.trace("handleQuestion:\n{}", message);

@@ -15,9 +15,10 @@ public interface IRecordHandler {
      * 处理 question 请求
      *
      * @param message 包含 question 的 message
+     * @param host    调用者 ip
      * @return 返回 true 表示已经处理了本条 message, 不再进行后边的 chain 的调用, false 表示还未处理本条 message
      */
-    boolean handleQuestion(Message message);
+    boolean handleQuestion(Message message, String host);
 
     /**
      * 当前 handler 是否支持 本次 Question 的 type<br/>

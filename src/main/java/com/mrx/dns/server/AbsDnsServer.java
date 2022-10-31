@@ -76,11 +76,19 @@ public abstract class AbsDnsServer extends Thread {
                 DatagramPacket packet = new DatagramPacket(buff, 0, BUFF_SIZE);
                 socket.receive(packet);
                 logger.trace("收到请求: {}", packet.getSocketAddress());
-                packet.setData(packetHandler(packet.getData()));
+                packet.setData(packetHandler(packet.getData(), packet.getAddress().getHostAddress()));
                 socket.send(packet);
             }
         }
     }
+
+    /**
+     * 当 socket 收到一个 packet 时调用本方法
+     *
+     * @param packet 收到的 packet
+     * @return 要发回去的 packet
+     */
+    protected abstract byte[] packetHandler(byte[] packet, String host);
 
     /**
      * 以 nio 方式启动服务器
@@ -96,20 +104,12 @@ public abstract class AbsDnsServer extends Thread {
                 buffer.clear();
                 // 接受客户端发送数据
                 SocketAddress client = channel.receive(buffer);
-                if (client != null) {
-                    channel.send(ByteBuffer.wrap(packetHandler(buffer.array())), client);
+                if (client instanceof InetSocketAddress) {
+                    channel.send(ByteBuffer.wrap(packetHandler(buffer.array(), ((InetSocketAddress) client).getHostName())), client);
                 }
             }
         }
     }
-
-    /**
-     * 当 socket 收到一个 packet 时调用本方法
-     *
-     * @param packet 收到的 packet
-     * @return 要发回去的 packet
-     */
-    protected abstract byte[] packetHandler(byte[] packet);
 
     /**
      * DNS 服务器启动模式

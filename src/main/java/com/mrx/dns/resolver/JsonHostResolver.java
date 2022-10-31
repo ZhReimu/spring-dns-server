@@ -23,9 +23,9 @@ public class JsonHostResolver implements IResolver {
     }
 
     @Override
-    public List<String> getIpsByHost(String host) {
+    public List<String> getIpsByHost(String host, String ip) {
         // 优先使用 host.json 中的内容解析
-        return hostsMap.getIpsByHost(host);
+        return hostsMap.getIpsByHost(host, ip);
     }
 
 }

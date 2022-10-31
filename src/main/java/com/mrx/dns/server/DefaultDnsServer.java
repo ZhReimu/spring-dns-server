@@ -84,11 +84,11 @@ public class DefaultDnsServer extends AbsDnsServer {
     }
 
     @SneakyThrows
-    protected byte[] packetHandler(byte[] packet) {
+    protected byte[] packetHandler(byte[] packet, String host) {
         Message message = new Message(packet);
         for (IRecordHandler handler : recordHandlerChain) {
             // 如果 handler 支持 本次 Question, 那就调用它处理, 如果当前 handler 处理返回 true, 那就终止事件传递
-            if (handler.supportType(message.getQuestion().getType()) && handler.handleQuestion(message)) break;
+            if (handler.supportType(message.getQuestion().getType()) && handler.handleQuestion(message, host)) break;
         }
         return message.toWire();
     }
@@ -101,7 +101,7 @@ public class DefaultDnsServer extends AbsDnsServer {
         private static final Logger logger = LoggerFactory.getLogger(NoneRecordHandler.class);
 
         @Override
-        public boolean handleQuestion(Message message) {
+        public boolean handleQuestion(Message message, String host) {
             Record r = message.getQuestion();
             logger.warn("跳过不支持的 DNS 查询: {} -> {}", r.getName(), Type.string(r.getType()));
             RecordUtil.clearRecord(message);
@@ -124,7 +124,7 @@ public class DefaultDnsServer extends AbsDnsServer {
         private final Logger logger = LoggerFactory.getLogger(NSRecordHandler.class);
 
         @Override
-        public boolean handleQuestion(Message message) {
+        public boolean handleQuestion(Message message, String host) {
             Name name = message.getQuestion().getName();
             message.addRecord(RecordUtil.newNsRecord(name, SERVER_NAME), Section.AUTHORITY);
             Header header = message.getHeader();
@@ -172,12 +172,12 @@ public class DefaultDnsServer extends AbsDnsServer {
 
         @Override
         @SneakyThrows
-        public boolean handleQuestion(Message message) {
+        public boolean handleQuestion(Message message, String host) {
             Name name = message.getQuestion().getName();
-            String host = name.toString();
+            String nameHost = name.toString();
             // 只处理 ips 中存在的反向域名解析
-            if (ips.contains(host)) {
-                message.addRecord(RecordUtil.newRecord(ARecord.class, SERVER_NAME, host.replace(".in-addr.arpa.", "")), Section.ANSWER);
+            if (ips.contains(nameHost)) {
+                message.addRecord(RecordUtil.newRecord(ARecord.class, SERVER_NAME, nameHost.replace(".in-addr.arpa.", "")), Section.ANSWER);
                 logger.trace("PTRQuestion:\n{}", message);
                 return true;
             }

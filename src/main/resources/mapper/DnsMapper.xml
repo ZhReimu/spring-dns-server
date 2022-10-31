@@ -31,9 +31,9 @@
     </insert>
 
     <insert id="insertLogBatch">
-        INSERT INTO tb_resolve_log(host) VALUES
+        INSERT INTO tb_resolve_log(host,ip) VALUES
         <foreach collection="resolveLog" item="host" separator=",">
-            (#{host})
+            (#{host.host},#{host.ip})
         </foreach>
     </insert>
 

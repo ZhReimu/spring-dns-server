@@ -6,6 +6,7 @@ import com.mrx.dns.util.NetworkUtil;
 import com.mrx.springdnsserver.model.dns.Dns;
 import com.mrx.springdnsserver.model.dns.DnsRecord;
 import com.mrx.springdnsserver.model.dns.Host;
+import com.mrx.springdnsserver.model.dns.ResolveLog;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.slf4j.Logger;
@@ -32,7 +33,7 @@ public interface DnsMapper extends IHostRepository, IResolver {
 
     Logger logger = LoggerFactory.getLogger(DnsMapper.class);
 
-    List<String> resolveLog = new ArrayList<>();
+    List<ResolveLog> resolveLog = new ArrayList<>();
 
     List<String> getIPsByHost(@Param("host") String host);
 
@@ -74,10 +75,10 @@ public interface DnsMapper extends IHostRepository, IResolver {
     }
 
     @Override
-    default List<String> getIpsByHost(String nKey) {
+    default List<String> getIpsByHost(String nKey, String ip) {
         // 记录日志
         synchronized (resolveLog) {
-            resolveLog.add(nKey);
+            resolveLog.add(ResolveLog.of(nKey, ip));
         }
         // 实现 泛域名解析
         DnsRecord gDnsRecord = getGDnsRecord(nKey);
@@ -130,7 +131,7 @@ public interface DnsMapper extends IHostRepository, IResolver {
 
     DnsRecord getGDnsRecord(@Param("host") String host);
 
-    void insertLogBatch(@Param("resolveLog") List<String> resolveLog);
+    void insertLogBatch(@Param("resolveLog") List<ResolveLog> resolveLog);
 
     void addErrorHost(Host host);
 

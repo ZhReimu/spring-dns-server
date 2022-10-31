@@ -49,10 +49,11 @@ public class HostsMap implements IHostRepository {
      * 使用 host 查找对应的 ip
      *
      * @param host host ( 域名 )
+     * @param ip   调用者的 ip
      * @return 找到的 与 该 host 对应的 ip, 如果真的找不到, 那将返回 {@link Collections#emptyList()}
      */
     @SuppressWarnings("DuplicatedCode")
-    public List<String> getIpsByHost(String host) {
+    public List<String> getIpsByHost(String host, String ip) {
         logger.trace("使用 hosts.json 解析: {}", host);
         // 实现 泛域名解析
         for (Map.Entry<String, List<String>> entry : map.entrySet()) {

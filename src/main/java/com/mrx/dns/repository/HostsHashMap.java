@@ -41,6 +41,7 @@ public class HostsHashMap implements IHostRepository {
         }
     }
 
+    @SuppressWarnings("unused")
     public static HostsHashMap getInstance() {
         return instance;
     }
@@ -54,9 +55,10 @@ public class HostsHashMap implements IHostRepository {
      * 使用 host 查找对应的 ip
      *
      * @param host host ( 域名 )
+     * @param ip   调用者的 ip
      * @return 找到的 与 该 host 对应的 ip, 如果真的找不到, 那将返回 {@link Collections#emptyList()}
      */
-    public List<String> getIpsByHost(String host) {
+    public List<String> getIpsByHost(String host, String ip) {
         // key: www.baidu.com.
         // map: *.baidu.com -> 127.0.0.1
         // m.baidu.com, www.baidu.com, baidu.com

@@ -67,8 +67,7 @@ public interface DnsMapper extends IHostRepository {
         }
         return ipChecker(hosts);
     }
-
-    // TODO: 2022-10-31 上午 11:30:37 解决 tb_host 中 host 可能重复的问题
+    
     @Select("SELECT * FROM tb_host WHERE host = #{host} LIMIT 1")
     Host checkHostExists(@Param("host") String host);
 
@@ -96,8 +95,23 @@ public interface DnsMapper extends IHostRepository {
     @Options(useGeneratedKeys = true, keyProperty = "id", keyColumn = "id")
     Boolean addHost(Host host);
 
-    default Boolean addHostAndDns(Host host, List<String> ips) {
-        return addHost(host) && addDns(Dns.of(host, ips));
+    /**
+     * 向数据库添加 host 和 dns
+     *
+     * @param host 要添加的 host, 无 id
+     * @param ips  该 host 所对应的 ip
+     * @return 添加结果
+     */
+    default Boolean addHostAndDns(final Host host, List<String> ips) {
+        // 添加 host 之前, 先检查 host 是否存在
+        Host hostInDB = checkHostExists(host.getHost());
+        // 若不存在, 先走添加 host 流程, 再走添加 dns 流程
+        if (hostInDB == null) {
+            // 执行了 addHost 后 host 就会有 id
+            return addHost(host) && addDns(Dns.of(host, ips));
+        }
+        // 若存在, 走 添加 dns 流程, hostInDB 里包含 id
+        return addDns(Dns.of(hostInDB, ips));
     }
 
     Boolean addDns(Dns dns);

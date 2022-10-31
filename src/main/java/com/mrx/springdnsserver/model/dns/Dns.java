@@ -31,6 +31,13 @@ public class Dns {
         this(host.getId(), ip);
     }
 
+    /**
+     * 使用 hostId 和 ip 组成一个 dns 对象
+     *
+     * @param host 带有 id 的 host 对象
+     * @param ip   该 host 对应的 ip
+     * @return dns 对象
+     */
     public static Dns of(Host host, List<String> ip) {
         return new Dns(host, ip);
     }

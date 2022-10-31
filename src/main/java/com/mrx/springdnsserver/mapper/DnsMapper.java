@@ -57,7 +57,7 @@ public interface DnsMapper extends IHostRepository {
                     return ipChecker(res);
                 });
             } catch (Exception e) {
-                logger.warn("调用系统 dns 出错: {}", e.getLocalizedMessage());
+                logger.warn("调用系统 dns 出错: {} -> {}", e.getLocalizedMessage(), e.getClass().getName());
                 addErrorHost(host);
                 hosts = Collections.emptyList();
             }

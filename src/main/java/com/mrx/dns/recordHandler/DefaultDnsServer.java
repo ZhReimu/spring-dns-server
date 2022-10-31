@@ -100,7 +100,8 @@ public class DefaultDnsServer extends AbsDnsServer {
 
         @Override
         public boolean handleQuestion(Message message) {
-            logger.debug("跳过不支持的 DNS 查询:\n{}", message);
+            Record r = message.getQuestion();
+            logger.warn("跳过不支持的 DNS 查询: {} -> {}", r.getName(), Type.string(r.getType()));
             RecordUtil.clearRecord(message);
             return true;
         }

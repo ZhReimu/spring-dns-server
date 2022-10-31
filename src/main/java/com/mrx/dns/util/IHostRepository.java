@@ -1,9 +1,9 @@
 package com.mrx.dns.util;
 
+import lombok.SneakyThrows;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -19,6 +19,7 @@ public interface IHostRepository {
      * @param host 要查找 ip 的 域名, 末尾带 .
      * @return 该域名的 ip
      */
+    @SneakyThrows
     default List<String> get(String host) {
         // 去除 dns 查询的域名后缀 .
         String nKey = host.substring(0, host.length() - 1);
@@ -33,16 +34,10 @@ public interface IHostRepository {
      */
     List<String> getIpsByHost(String host);
 
-    default List<String> runMeasure(XSupplier<List<String>> supplier) {
+    default <T> T runMeasure(XSupplier<T> supplier) throws Exception {
         Logger logger = LoggerFactory.getLogger(IHostRepository.class);
         long start = System.currentTimeMillis();
-        List<String> res;
-        try {
-            res = supplier.get();
-        } catch (Exception e) {
-            logger.warn("runMeasure 出现异常: {}", e.getLocalizedMessage());
-            res = Collections.emptyList();
-        }
+        T res = supplier.get();
         long end = System.currentTimeMillis();
         logger.debug("本次操作耗时: {} ms", end - start);
         return res;

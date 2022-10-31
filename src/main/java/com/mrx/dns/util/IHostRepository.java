@@ -1,9 +1,9 @@
 package com.mrx.dns.util;
 
-import lombok.SneakyThrows;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -33,11 +33,16 @@ public interface IHostRepository {
      */
     List<String> getIpsByHost(String host);
 
-    @SneakyThrows
-    default <T> T runMeasure(XSupplier<T> supplier) {
+    default List<String> runMeasure(XSupplier<List<String>> supplier) {
         Logger logger = LoggerFactory.getLogger(IHostRepository.class);
         long start = System.currentTimeMillis();
-        T res = supplier.get();
+        List<String> res;
+        try {
+            res = supplier.get();
+        } catch (Exception e) {
+            logger.warn("runMeasure 出现异常: {}", e.getLocalizedMessage());
+            res = Collections.emptyList();
+        }
         long end = System.currentTimeMillis();
         logger.debug("本次操作耗时: {} ms", end - start);
         return res;

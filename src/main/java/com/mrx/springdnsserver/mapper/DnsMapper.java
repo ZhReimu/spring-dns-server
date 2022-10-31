@@ -43,7 +43,7 @@ public interface DnsMapper extends IHostRepository {
         if (hosts == null || hosts.isEmpty()) {
             Host host = new Host(nKey);
             try {
-                logger.warn("开始递归解析: {}", nKey);
+                logger.info("开始递归解析: {}", nKey);
                 // 如果没有手动指定 hosts, 那就尝试调用系统 dns 的结果
                 return runMeasure(() -> {
                     List<String> res = Arrays.stream(InetAddress.getAllByName(nKey))
@@ -57,7 +57,7 @@ public interface DnsMapper extends IHostRepository {
                     return ipChecker(res);
                 });
             } catch (Exception e) {
-                logger.warn("调用系统 dns 出错:", e);
+                logger.warn("调用系统 dns 出错: {}", e.getLocalizedMessage());
                 addErrorHost(host);
                 hosts = Collections.emptyList();
             }

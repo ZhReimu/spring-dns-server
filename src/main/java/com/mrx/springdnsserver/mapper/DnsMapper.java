@@ -26,7 +26,7 @@ public interface DnsMapper extends IHostRepository {
 
     Logger logger = LoggerFactory.getLogger(DnsMapper.class);
 
-    @Select("SELECT ip FROM tb_dns WHERE host_id = (SELECT id FROM tb_host WHERE host = #{host})")
+    @Select("SELECT b.ip FROM tb_host AS a INNER JOIN tb_dns AS b ON a.id = b.host_id WHERE a.host = #{host}")
     List<String> getIPsByHost(@Param("host") String host);
 
     /**

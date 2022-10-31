@@ -5,7 +5,9 @@ import com.alibaba.fastjson2.JSONObject;
 import lombok.Data;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.util.CollectionUtils;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -48,10 +50,15 @@ public class Result<T> {
         this.code = code;
         this.success = success;
         this.message = message;
-        if (data instanceof List) {
+        boolean isLogged = false;
+        if (data instanceof List && !CollectionUtils.isEmpty((Collection<?>) data)) {
             log.debug("createResult: {}, data[0]: {}", this, ((List<?>) data).get(0));
+            isLogged = true;
         }
         this.data = data;
+        if (!isLogged) {
+            log.debug("createResult: {}", this);
+        }
     }
 
     @NonNull

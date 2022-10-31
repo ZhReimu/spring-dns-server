@@ -177,7 +177,7 @@ public class DefaultDnsServer extends AbsDnsServer {
             String nameHost = name.toString();
             // 只处理 ips 中存在的反向域名解析
             if (ips.contains(nameHost)) {
-                message.addRecord(RecordUtil.newRecord(ARecord.class, SERVER_NAME, nameHost.replace(".in-addr.arpa.", "")), Section.ANSWER);
+                message.addRecord(RecordUtil.newPTRRecord(SERVER_NAME, name), Section.ANSWER);
                 logger.trace("PTRQuestion:\n{}", message);
                 return true;
             }

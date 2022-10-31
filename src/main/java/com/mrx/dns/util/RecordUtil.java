@@ -11,10 +11,13 @@ import java.net.InetAddress;
  */
 public class RecordUtil {
 
+    public static final int TTL = 600;
+
+    @Deprecated
     @SneakyThrows
     public static <T extends Record> T newRecord(Class<T> type, Name name, String host) {
         return type.getConstructor(Name.class, int.class, long.class, InetAddress.class)
-                .newInstance(name, DClass.IN, 128, InetAddress.getByName(host));
+                .newInstance(name, DClass.IN, TTL, InetAddress.getByName(host));
     }
 
     /**
@@ -25,7 +28,16 @@ public class RecordUtil {
      * @return 新的 nsRecord
      */
     public static NSRecord newNsRecord(Name name, Name target) {
-        return new NSRecord(name, DClass.IN, 128, target);
+        return new NSRecord(name, DClass.IN, TTL, target);
+    }
+
+    @SneakyThrows
+    public static ARecord newARecord(Name name, String host) {
+        return new ARecord(name, DClass.IN, TTL, InetAddress.getByName(host));
+    }
+
+    public static PTRRecord newPTRRecord(Name name, Name target) {
+        return new PTRRecord(target, DClass.IN, TTL, name);
     }
 
     /**

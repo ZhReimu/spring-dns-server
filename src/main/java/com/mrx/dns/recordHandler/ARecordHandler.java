@@ -4,7 +4,10 @@ import com.mrx.dns.resolver.Resolver;
 import com.mrx.dns.util.RecordUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xbill.DNS.*;
+import org.xbill.DNS.Message;
+import org.xbill.DNS.Name;
+import org.xbill.DNS.Section;
+import org.xbill.DNS.Type;
 
 import java.util.List;
 
@@ -31,7 +34,7 @@ public class ARecordHandler implements IRecordHandler {
             // 如果 响应内容 为空, 那就返回 空响应
             RecordUtil.clearRecord(message);
         } else {
-            answers.forEach(it -> message.addRecord(RecordUtil.newRecord(ARecord.class, name, it), Section.ANSWER));
+            answers.forEach(it -> message.addRecord(RecordUtil.newARecord(name, it), Section.ANSWER));
         }
         logger.trace("handleQuestion:\n{}", message);
         // 处理完毕, 退出 chain

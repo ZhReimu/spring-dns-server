@@ -7,10 +7,12 @@ import com.mrx.springdnsserver.model.result.Result;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.constraints.Positive;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,6 +20,7 @@ import java.util.Optional;
  * @author Mr.X
  * @since 2022-10-31 07:04
  */
+@Validated
 @RestController
 public class DnsController {
 
@@ -55,6 +58,11 @@ public class DnsController {
                 Optional.ofNullable(mapper.getGDnsRecord(host).setHost(host))
                         .orElse(mapper.getDnsRecordByHost(host))
         );
+    }
+
+    @GetMapping("/info")
+    public Result<?> getResolveInfo(@RequestParam @Positive(message = "interval 必须为 正整数") Integer interval) {
+        return Result.success(mapper.countResolveByInterval(interval, 10));
     }
 
 }

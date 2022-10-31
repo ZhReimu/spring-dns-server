@@ -6,7 +6,8 @@ import com.mrx.springdnsserver.config.DnsServerConfig;
 import com.mrx.springdnsserver.model.dns.Dns;
 import com.mrx.springdnsserver.model.dns.DnsRecord;
 import com.mrx.springdnsserver.model.dns.Host;
-import org.apache.ibatis.annotations.*;
+import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,7 +30,6 @@ public interface DnsMapper extends IHostRepository {
 
     List<String> resolveLog = new ArrayList<>();
 
-    @Select("SELECT b.ip FROM tb_host AS a INNER JOIN tb_dns AS b ON a.id = b.host_id WHERE a.host = #{host}")
     List<String> getIPsByHost(@Param("host") String host);
 
     /**
@@ -39,7 +39,6 @@ public interface DnsMapper extends IHostRepository {
      * @param ip     更新后的 ip
      * @return 更新结果
      */
-    @Update("UPDATE tb_dns SET ip = ip WHERE host_id = #{hostId}")
     Boolean updateDns(@Param("hostId") Integer hostId, @Param("ip") String ip);
 
     DnsRecord getDnsRecordByHost(String host);
@@ -138,14 +137,10 @@ public interface DnsMapper extends IHostRepository {
 
     void insertLogBatch(@Param("resolveLog") List<String> resolveLog);
 
-    @Insert("INSERT INTO tb_host_error(host) VALUES (#{host})")
     void addErrorHost(Host host);
 
-    @Select("SELECT * FROM tb_host WHERE host = #{host} LIMIT 1")
     Host getHostFromDB(@Param("host") String host);
 
-    @Insert("INSERT INTO tb_host(host) VALUES (#{host})")
-    @Options(useGeneratedKeys = true, keyProperty = "id", keyColumn = "id")
     Boolean addHost(Host host);
 
     Boolean addDns(Dns dns);

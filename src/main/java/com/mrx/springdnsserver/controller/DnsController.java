@@ -51,7 +51,10 @@ public class DnsController {
 
     @GetMapping("/query")
     public Result<?> queryDns(@RequestParam String host) {
-        return Result.success(Optional.ofNullable(mapper.getGDnsRecord(host)).orElse(mapper.getDnsRecordByHost(host)));
+        return Result.success(
+                Optional.ofNullable(mapper.getGDnsRecord(host).setHost(host))
+                        .orElse(mapper.getDnsRecordByHost(host))
+        );
     }
 
 }

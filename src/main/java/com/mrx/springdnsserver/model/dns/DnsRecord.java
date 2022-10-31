@@ -1,6 +1,7 @@
 package com.mrx.springdnsserver.model.dns;
 
 import lombok.Data;
+import lombok.experimental.Accessors;
 
 import java.util.List;
 
@@ -9,6 +10,7 @@ import java.util.List;
  * @since 2022-10-31 08:00
  */
 @Data
+@Accessors(chain = true)
 public class DnsRecord {
 
     /**

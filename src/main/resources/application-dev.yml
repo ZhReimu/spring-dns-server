@@ -16,3 +16,6 @@ dns:
 mybatis:
   type-aliases-package: com.mrx.springdnsserver.model
   mapper-locations: classpath:mapper/*.xml, com.mrx.springdnsserver.mapper/*
+server:
+  port: 8080
+  address: 0.0.0.0

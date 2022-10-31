@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author Mr.X
@@ -50,7 +51,7 @@ public class DnsController {
 
     @GetMapping("/query")
     public Result<?> queryDns(@RequestParam String host) {
-        return Result.success(mapper.getDnsRecordByHost(host));
+        return Result.success(Optional.ofNullable(mapper.getGDnsRecord(host)).orElse(mapper.getDnsRecordByHost(host)));
     }
 
 }

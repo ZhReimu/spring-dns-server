@@ -32,6 +32,13 @@
         </foreach>
     </insert>
 
+    <insert id="insertLogBatch">
+        INSERT INTO tb_resolve_log(host) VALUES
+        <foreach collection="resolveLog" item="host" separator=",">
+            (#{host})
+        </foreach>
+    </insert>
+
     <select id="getDnsRecordByHost" resultMap="DnsRecordResultMap">
         SELECT id, host
         FROM tb_host
@@ -39,7 +46,7 @@
     </select>
 
     <select id="getGDnsRecord" resultMap="GDnsRecordResultMap">
-        SELECT *
+        SELECT id, host
         FROM tb_generic_host
         WHERE INSTR(#{host}, SUBSTRING(host, 3, LENGTH(host))) > 0
     </select>

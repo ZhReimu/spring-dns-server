@@ -35,7 +35,7 @@ public class DnsController {
             @RequestParam List<String> ip
     ) {
         logger.debug("updateDns: {} -> {}", host, ip);
-        Host hostInDB = mapper.checkHostExists(host);
+        Host hostInDB = mapper.getHostFromDB(host);
         logger.debug("hostInDB: {}", hostInDB);
         // 如果数据库中已存在 host 记录, 那就只管更新 dns
         if (hostInDB != null && !ip.isEmpty()) {

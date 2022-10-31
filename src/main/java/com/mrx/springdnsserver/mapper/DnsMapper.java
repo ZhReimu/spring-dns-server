@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 
 import java.net.Inet4Address;
 import java.net.InetAddress;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -25,6 +26,8 @@ import java.util.stream.Collectors;
 public interface DnsMapper extends IHostRepository {
 
     Logger logger = LoggerFactory.getLogger(DnsMapper.class);
+
+    List<String> resolveLog = new ArrayList<>();
 
     @Select("SELECT b.ip FROM tb_host AS a INNER JOIN tb_dns AS b ON a.id = b.host_id WHERE a.host = #{host}")
     List<String> getIPsByHost(@Param("host") String host);
@@ -43,8 +46,8 @@ public interface DnsMapper extends IHostRepository {
 
     @Override
     default List<String> getIpsByHost(String nKey) {
-        // 记录 解析日志
-        // Optional.ofNullable(checkHostExists(nKey)).ifPresent(this::insertLog);
+        // 记录日志
+        addLog(nKey);
         // 实现 泛域名解析
         DnsRecord gDnsRecord = getGDnsRecord(nKey);
         if (gDnsRecord != null) {
@@ -73,6 +76,33 @@ public interface DnsMapper extends IHostRepository {
             }
         }
         return ipChecker(hosts);
+    }
+
+    default void addLog(String host) {
+        resolveLog.add(host);
+        if (resolveLog.size() >= 10) {
+            insertLogBatch(resolveLog);
+            resolveLog.clear();
+        }
+    }
+
+    /**
+     * 向数据库添加 host 和 dns
+     *
+     * @param host 要添加的 host, 无 id
+     * @param ips  该 host 所对应的 ip
+     * @return 添加结果
+     */
+    default Boolean addHostAndDns(final Host host, List<String> ips) {
+        // 添加 host 之前, 先检查 host 是否存在
+        Host hostInDB = getHostFromDB(host.getHost());
+        // 若不存在, 先走添加 host 流程, 再走添加 dns 流程
+        if (hostInDB == null) {
+            // 执行了 addHost 后 host 就会有 id
+            return addHost(host) && addDns(Dns.of(host, ips));
+        }
+        // 若存在, 走 添加 dns 流程, hostInDB 里包含 id
+        return addDns(Dns.of(hostInDB, ips));
     }
 
     DnsRecord getGDnsRecord(@Param("host") String host);
@@ -107,30 +137,13 @@ public interface DnsMapper extends IHostRepository {
     @Select("SELECT ip FROM tb_generic_dns WHERE host_id = #{hostId}")
     List<String> getGHostIpsByGHost(@Param("hostId") Integer hostId);
 
-    /**
-     * 向数据库添加 host 和 dns
-     *
-     * @param host 要添加的 host, 无 id
-     * @param ips  该 host 所对应的 ip
-     * @return 添加结果
-     */
-    default Boolean addHostAndDns(final Host host, List<String> ips) {
-        // 添加 host 之前, 先检查 host 是否存在
-        Host hostInDB = checkHostExists(host.getHost());
-        // 若不存在, 先走添加 host 流程, 再走添加 dns 流程
-        if (hostInDB == null) {
-            // 执行了 addHost 后 host 就会有 id
-            return addHost(host) && addDns(Dns.of(host, ips));
-        }
-        // 若存在, 走 添加 dns 流程, hostInDB 里包含 id
-        return addDns(Dns.of(hostInDB, ips));
-    }
+    void insertLogBatch(@Param("resolveLog") List<String> resolveLog);
 
     @Insert("INSERT INTO tb_host_error(host) VALUES (#{host})")
     void addErrorHost(Host host);
 
     @Select("SELECT * FROM tb_host WHERE host = #{host} LIMIT 1")
-    Host checkHostExists(@Param("host") String host);
+    Host getHostFromDB(@Param("host") String host);
 
     @Insert("INSERT INTO tb_host(host) VALUES (#{host})")
     @Options(useGeneratedKeys = true, keyProperty = "id", keyColumn = "id")

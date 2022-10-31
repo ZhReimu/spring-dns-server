@@ -11,10 +11,19 @@ import java.util.List;
 @Data
 public class DnsRecord {
 
+    /**
+     * host 表中的 id
+     */
     private Integer id;
 
+    /**
+     * host 表中的 host
+     */
     private String host;
 
+    /**
+     * dns 表中的 ip
+     */
     private List<String> ips;
 
 }

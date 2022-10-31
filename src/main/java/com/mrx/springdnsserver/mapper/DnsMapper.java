@@ -47,7 +47,9 @@ public interface DnsMapper extends IHostRepository {
     @Override
     default List<String> getIpsByHost(String nKey) {
         // 记录日志
-        addLog(nKey);
+        synchronized (resolveLog) {
+            resolveLog.add(nKey);
+        }
         // 实现 泛域名解析
         DnsRecord gDnsRecord = getGDnsRecord(nKey);
         if (gDnsRecord != null) {
@@ -76,14 +78,6 @@ public interface DnsMapper extends IHostRepository {
             }
         }
         return ipChecker(hosts);
-    }
-
-    default void addLog(String host) {
-        resolveLog.add(host);
-        if (resolveLog.size() >= 10) {
-            insertLogBatch(resolveLog);
-            resolveLog.clear();
-        }
     }
 
     /**

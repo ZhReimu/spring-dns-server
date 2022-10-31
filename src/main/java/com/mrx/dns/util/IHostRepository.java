@@ -43,6 +43,14 @@ public interface IHostRepository {
         return res;
     }
 
+    default void runMeasure(Runnable supplier) {
+        Logger logger = LoggerFactory.getLogger(IHostRepository.class);
+        long start = System.currentTimeMillis();
+        supplier.run();
+        long end = System.currentTimeMillis();
+        logger.debug("本次操作耗时: {} ms", end - start);
+    }
+
     interface XSupplier<T> {
 
         T get() throws Exception;

@@ -44,6 +44,15 @@ public interface DnsMapper extends IHostRepository {
 
     DnsRecord getDnsRecordByHost(String host);
 
+    default void saveLog() {
+        runMeasure(() -> {
+            insertLogBatch(resolveLog);
+            synchronized (resolveLog) {
+                resolveLog.clear();
+            }
+        });
+    }
+
     @Override
     default List<String> getIpsByHost(String nKey) {
         // 记录日志

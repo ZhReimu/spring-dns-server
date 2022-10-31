@@ -28,10 +28,7 @@ public class ResolveLogKeeper {
     @Scheduled(cron = "0 0/2 * * * ?")
     public void saveLog() {
         logger.debug("计划任务, 保存 resolveLog: {}", resolveLog.size());
-        mapper.insertLogBatch(resolveLog);
-        synchronized (resolveLog) {
-            resolveLog.clear();
-        }
+        if (!resolveLog.isEmpty()) mapper.saveLog();
     }
 
 }

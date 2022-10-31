@@ -14,6 +14,7 @@ import java.net.InetAddress;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -29,6 +30,8 @@ public interface DnsMapper extends IHostRepository {
     @Override
     default List<String> getIpsByHost(String nKey) {
         Logger logger = LoggerFactory.getLogger(DnsMapper.class);
+        // 记录 解析日志
+        Optional.ofNullable(checkHostExists(nKey)).ifPresent(this::insertLog);
         // 实现 泛域名解析
         for (Host host : listGenericDomains()) {
             String gHost = host.getHost();
@@ -64,6 +67,10 @@ public interface DnsMapper extends IHostRepository {
         }
         return ipChecker(hosts);
     }
+
+    // TODO: 2022-10-31 上午 11:30:37 解决 tb_host 中 host 可能重复的问题
+    @Select("SELECT * FROM tb_host WHERE host = #{host} LIMIT 1")
+    Host checkHostExists(@Param("host") String host);
 
     /**
      * 检测 ips 中的 ip 是否为 cloudflare ip, 如果是, 那就将其替换为 当前设置的最优 cloudflare ip {@link DnsServerConfig#getCfip()}<br/>
@@ -111,8 +118,8 @@ public interface DnsMapper extends IHostRepository {
     @Select("SELECT ip FROM tb_dns WHERE host_id = #{hostId}")
     List<String> getIpsByHostId(@Param("hostId") Integer hostId);
 
-    @Select("SELECT * FROM tb_host WHERE host = #{host}")
-    Host checkHostExists(@Param("host") String host);
+    @Insert("INSERT INTO tb_resolve_log(host_id) VALUES (#{id})")
+    void insertLog(Host host);
 
     DnsRecord getDnsRecordByHost(String host);
 

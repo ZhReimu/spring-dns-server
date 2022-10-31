@@ -1,4 +1,4 @@
-package com.mrx.dns;
+package com.mrx.dns.server;
 
 import lombok.SneakyThrows;
 import org.slf4j.Logger;

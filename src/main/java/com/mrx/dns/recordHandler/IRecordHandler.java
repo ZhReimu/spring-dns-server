@@ -1,5 +1,6 @@
 package com.mrx.dns.recordHandler;
 
+import com.mrx.dns.server.AbsDnsServer;
 import org.xbill.DNS.Message;
 
 import java.net.DatagramPacket;
@@ -20,7 +21,7 @@ public interface IRecordHandler {
 
     /**
      * 当前 handler 是否支持 本次 Question 的 type<br/>
-     * 若 不支持, 在 {@link com.mrx.dns.AbsDnsServer#packetHandler(DatagramPacket)} 中不会被调用
+     * 若 不支持, 在 {@link AbsDnsServer#packetHandler(DatagramPacket)} 中不会被调用
      *
      * @param type {@link org.xbill.DNS.Type}
      * @return 支持为 true, 不支持为 false

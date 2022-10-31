@@ -1,7 +1,8 @@
 package com.mrx.dns;
 
-import com.mrx.dns.recordHandler.DefaultDnsServer;
 import com.mrx.dns.resolver.Resolver;
+import com.mrx.dns.server.AbsDnsServer;
+import com.mrx.dns.server.DefaultDnsServer;
 import lombok.SneakyThrows;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

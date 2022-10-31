@@ -1,8 +1,10 @@
-package com.mrx.dns.recordHandler;
+package com.mrx.dns.server;
 
-import com.mrx.dns.AbsDnsServer;
-import com.mrx.dns.RecordUtil;
+import com.mrx.dns.recordHandler.AAAARecordHandler;
+import com.mrx.dns.recordHandler.ARecordHandler;
+import com.mrx.dns.recordHandler.IRecordHandler;
 import com.mrx.dns.resolver.Resolver;
+import com.mrx.dns.util.RecordUtil;
 import lombok.SneakyThrows;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

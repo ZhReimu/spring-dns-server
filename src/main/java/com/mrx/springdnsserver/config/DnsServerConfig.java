@@ -1,6 +1,6 @@
 package com.mrx.springdnsserver.config;
 
-import com.mrx.dns.AbsDnsServer;
+import com.mrx.dns.server.AbsDnsServer;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 

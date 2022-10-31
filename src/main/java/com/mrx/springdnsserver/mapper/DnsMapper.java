@@ -66,17 +66,26 @@ public interface DnsMapper extends IHostRepository, IResolver {
         runMeasure(() -> {
             Map<String, Integer> logCache = new HashMap<>();
             for (ResolveLog log : resolveLog) {
+                // 首先尝试从 logCache 中获取 LogIp 的 id
                 Integer ipId = Optional.ofNullable(logCache.get(log.getIp())).orElseGet(() -> {
+                    // 若 logCache 中不存在当前 LogIp 的 id, 那就尝试从数据库中获取 LogIp 的 id
                     LogIp logIp = Optional.ofNullable(getResolveIpByIp(log.getIp())).orElseGet(() -> {
+                        // 若 还是不存在, 那就插入一条 LogIp 并返回新插入的 LogIp 的 id
                         LogIp t = LogIp.of(log.getIp());
                         insertResolveIp(t);
                         return t;
                     });
-                    logCache.put(logIp.getIp(), logIp.getId());
+                    synchronized (logCache) {
+                        // 使用数据库中的 LogIp 信息填充 logCache
+                        logCache.put(logIp.getIp(), logIp.getId());
+                    }
+                    // 返回 数据库中的 LogIp 的 id
                     return logIp.getId();
                 });
+                // 更新此条数据的 ipId
                 log.setIpId(ipId);
             }
+            // 插入 解析日志
             insertLogBatch(resolveLog);
             synchronized (resolveLog) {
                 resolveLog.clear();

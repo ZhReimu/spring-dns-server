@@ -10,6 +10,8 @@ import java.net.InetAddress;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.mrx.dns.util.PerformanceUtil.runMeasure;
+
 /**
  * 使用 host.json 与 系统 dns 解析的 {@link IHostRepository}
  *

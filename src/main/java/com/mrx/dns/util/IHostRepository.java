@@ -1,10 +1,10 @@
 package com.mrx.dns.util;
 
 import lombok.SneakyThrows;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.List;
+
+import static com.mrx.dns.util.PerformanceUtil.runMeasure;
 
 /**
  * @author Mr.X
@@ -33,28 +33,5 @@ public interface IHostRepository {
      * @return 该域名的 ip
      */
     List<String> getIpsByHost(String host);
-
-    default <T> T runMeasure(XSupplier<T> supplier) throws Exception {
-        Logger logger = LoggerFactory.getLogger(IHostRepository.class);
-        long start = System.currentTimeMillis();
-        T res = supplier.get();
-        long end = System.currentTimeMillis();
-        logger.debug("本次操作耗时: {} ms", end - start);
-        return res;
-    }
-
-    default void runMeasure(Runnable supplier) {
-        Logger logger = LoggerFactory.getLogger(IHostRepository.class);
-        long start = System.currentTimeMillis();
-        supplier.run();
-        long end = System.currentTimeMillis();
-        logger.debug("本次操作耗时: {} ms", end - start);
-    }
-
-    interface XSupplier<T> {
-
-        T get() throws Exception;
-
-    }
 
 }

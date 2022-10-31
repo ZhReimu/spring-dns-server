@@ -10,6 +10,13 @@ import java.net.InetAddress;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * 使用 host.json 与 系统 dns 解析的 {@link IHostRepository}
+ *
+ * @author Mr.X
+ * @see HostsMap
+ * @since 2022-10-30 16:22
+ */
 public class HostsHashMap implements IHostRepository {
 
     private static final Logger logger = LoggerFactory.getLogger(HostsHashMap.class);

@@ -1,5 +1,6 @@
 package com.mrx.springdnsserver.mapper;
 
+import com.mrx.dns.util.HostsMap;
 import com.mrx.dns.util.IHostRepository;
 import com.mrx.dns.util.NetworkUtil;
 import com.mrx.springdnsserver.model.dns.Dns;
@@ -32,6 +33,8 @@ public interface DnsMapper extends IHostRepository {
 
     List<String> resolveLog = new ArrayList<>();
 
+    IHostRepository hostsMap = HostsMap.getInstance();
+
     List<String> getIPsByHost(@Param("host") String host);
 
     /**
@@ -60,6 +63,9 @@ public interface DnsMapper extends IHostRepository {
         synchronized (resolveLog) {
             resolveLog.add(nKey);
         }
+        // 优先使用 host.json 中的内容解析
+        List<String> hosts = hostsMap.getIpsByHost(nKey);
+        if (!CollectionUtils.isEmpty(hosts)) return hosts;
         // 实现 泛域名解析
         DnsRecord gDnsRecord = getGDnsRecord(nKey);
         if (gDnsRecord != null) {
@@ -67,7 +73,7 @@ public interface DnsMapper extends IHostRepository {
             return ipChecker(gDnsRecord.getIps());
         }
         // 普通域名解析
-        List<String> hosts = getIPsByHost(nKey);
+        hosts = getIPsByHost(nKey);
         if (CollectionUtils.isEmpty(hosts)) {
             Host host = new Host(nKey);
             try {

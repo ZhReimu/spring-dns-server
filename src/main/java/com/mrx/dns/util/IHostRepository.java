@@ -22,7 +22,7 @@ public interface IHostRepository {
     @SneakyThrows
     default List<String> get(String host) {
         // 去除 dns 查询的域名后缀 .
-        String nKey = host.substring(0, host.length() - 1);
+        String nKey = host.endsWith(".") ? host.substring(0, host.length() - 1) : host;
         return runMeasure(() -> getIpsByHost(nKey));
     }
 

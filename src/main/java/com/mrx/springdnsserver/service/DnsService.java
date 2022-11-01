@@ -1,6 +1,5 @@
 package com.mrx.springdnsserver.service;
 
-import com.mrx.dns.repository.IHostRepository;
 import com.mrx.dns.resolver.IResolver;
 import com.mrx.springdnsserver.mapper.DnsMapper;
 import com.mrx.springdnsserver.mapper.ResolveLogMapper;
@@ -8,6 +7,7 @@ import com.mrx.springdnsserver.model.dns.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -23,7 +23,7 @@ import static com.mrx.dns.util.PerformanceUtil.runMeasure;
  * @since 2022-11-01 11:23
  */
 @Service
-public class DnsService implements IHostRepository, IResolver {
+public class DnsService implements IResolver {
 
     public static final List<ResolveLog> resolveLog = new ArrayList<>();
 
@@ -127,7 +127,7 @@ public class DnsService implements IHostRepository, IResolver {
      * @param ips  该 host 所对应的 ip
      * @return 添加结果
      */
-    public Boolean addHostAndDns(final Host host, List<String> ips) {
+    public Boolean addHostAndDns(@NonNull final Host host, List<String> ips) {
         // 添加 host 之前, 先检查 host 是否存在
         Host hostInDB = dnsMapper.getHostFromDB(host.getHost());
         // 若不存在, 先走添加 host 流程, 再走添加 dns 流程

@@ -1,7 +1,8 @@
-package com.mrx.dns.resolver;
+package com.mrx.dns.resolver.impl;
 
 import com.mrx.dns.repository.HostsMap;
 import com.mrx.dns.repository.IHostRepository;
+import com.mrx.dns.resolver.IResolver;
 
 import java.util.List;
 

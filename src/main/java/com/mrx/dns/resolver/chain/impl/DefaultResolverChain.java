@@ -1,5 +1,7 @@
-package com.mrx.dns.resolver;
+package com.mrx.dns.resolver.chain.impl;
 
+import com.mrx.dns.resolver.IResolver;
+import com.mrx.dns.resolver.chain.IResolverChain;
 import com.mrx.dns.util.NetworkUtil;
 import org.springframework.util.CollectionUtils;
 
@@ -12,17 +14,18 @@ import java.util.stream.Collectors;
  * @author Mr.X
  * @since 2022-10-31 16:42
  */
-public class DefaultResolver implements IResolver {
+public class DefaultResolverChain implements IResolverChain {
 
-    private static final DefaultResolver instance = new DefaultResolver();
+    private static final DefaultResolverChain instance = new DefaultResolverChain();
 
     private final List<IResolver> resolvers = new ArrayList<>();
 
-    public static DefaultResolver getInstance(IResolver... resolvers) {
+    public static DefaultResolverChain getInstance(IResolver... resolvers) {
         instance.addResolver(resolvers);
         return instance;
     }
 
+    @Override
     public void addResolver(IResolver... resolvers) {
         this.resolvers.addAll(List.of(resolvers));
     }

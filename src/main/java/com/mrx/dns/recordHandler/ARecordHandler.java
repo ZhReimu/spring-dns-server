@@ -1,6 +1,6 @@
 package com.mrx.dns.recordHandler;
 
-import com.mrx.dns.resolver.DefaultResolver;
+import com.mrx.dns.resolver.chain.IResolverChain;
 import com.mrx.dns.util.RecordUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,16 +19,16 @@ public class ARecordHandler implements IRecordHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(ARecordHandler.class);
 
-    private final DefaultResolver resolver;
+    private final IResolverChain chain;
 
-    public ARecordHandler(DefaultResolver resolver) {
-        this.resolver = resolver;
+    public ARecordHandler(IResolverChain chain) {
+        this.chain = chain;
     }
 
     @Override
     public boolean handleQuestion(Message message, String host) {
         Name name = message.getQuestion().getName();
-        List<String> answers = resolver.get(name.toString(), host);
+        List<String> answers = chain.get(name.toString(), host);
         logger.debug("解析域名: {} -> {}", name, answers);
         if (answers.isEmpty()) {
             // 如果 响应内容 为空, 那就返回 空响应

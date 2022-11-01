@@ -30,11 +30,6 @@
         </foreach>
     </insert>
 
-    <insert id="addErrorHost">
-        INSERT INTO tb_host_error(host)
-        VALUES (#{host})
-    </insert>
-
     <insert id="addHost" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
         INSERT INTO tb_dns_host(host)
         VALUES (#{host})

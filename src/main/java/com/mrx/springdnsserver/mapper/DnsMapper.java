@@ -30,8 +30,6 @@ public interface DnsMapper {
 
     DnsRecord getGDnsRecord(@Param("host") String host);
 
-    void addErrorHost(Host host);
-
     Host getHostFromDB(@Param("host") String host);
 
     Boolean addHost(Host host);

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.mrx.springdnsserver.mapper.ErrorHostMapper">
+
+    <update id="insertOrUpdateErrorHost">
+        <selectKey keyProperty="id" keyColumn="id" resultType="int" order="BEFORE">
+            SELECT COUNT(*) FROM tb_host_error WHERE host = #{host}
+        </selectKey>
+        <if test="id == 0">
+            INSERT INTO tb_host_error(host)
+            VALUES (#{host})
+        </if>
+        <if test="id == 1">
+            UPDATE tb_host_error SET error_count = error_count + 1
+        </if>
+    </update>
+
+</mapper>

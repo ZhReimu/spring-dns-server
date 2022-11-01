@@ -3,6 +3,7 @@ package com.mrx.springdnsserver.service;
 import com.mrx.dns.resolver.IResolver;
 import com.mrx.springdnsserver.mapper.DnsIpMapper;
 import com.mrx.springdnsserver.mapper.DnsMapper;
+import com.mrx.springdnsserver.mapper.ErrorHostMapper;
 import com.mrx.springdnsserver.mapper.ResolveLogMapper;
 import com.mrx.springdnsserver.model.dns.*;
 import org.slf4j.Logger;
@@ -35,6 +36,13 @@ public class DnsService implements IResolver {
     private DnsMapper dnsMapper;
 
     private DnsIpMapper dnsIpMapper;
+
+    private ErrorHostMapper errorHostMapper;
+
+    @Autowired
+    public void setErrorHostMapper(ErrorHostMapper errorHostMapper) {
+        this.errorHostMapper = errorHostMapper;
+    }
 
     @Autowired
     public void setDnsIpMapper(DnsIpMapper dnsIpMapper) {
@@ -122,7 +130,7 @@ public class DnsService implements IResolver {
                 return hosts;
             } catch (Exception e) {
                 logger.warn("调用系统 dns 出错: {} -> {}", e.getLocalizedMessage(), e.getClass().getName());
-                dnsMapper.addErrorHost(host);
+                errorHostMapper.insertOrUpdateErrorHost(host);
                 hosts = Collections.emptyList();
             }
         }

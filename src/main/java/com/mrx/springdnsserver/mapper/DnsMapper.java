@@ -1,6 +1,5 @@
 package com.mrx.springdnsserver.mapper;
 
-import com.mrx.dns.resolver.IResolver;
 import com.mrx.springdnsserver.model.dns.Dns;
 import com.mrx.springdnsserver.model.dns.DnsRecord;
 import com.mrx.springdnsserver.model.dns.Host;
@@ -14,7 +13,7 @@ import java.util.List;
  * @since 2022-10-30 16:27
  */
 @Mapper
-public interface DnsMapper extends IResolver {
+public interface DnsMapper {
 
     List<String> getIPsByHost(@Param("host") String host);
 
@@ -28,11 +27,6 @@ public interface DnsMapper extends IResolver {
     Boolean updateDns(@Param("hostId") Integer hostId, @Param("ip") String ip);
 
     DnsRecord getDnsRecordByHost(String host);
-
-    @Override
-    default List<String> getIpsByHost(String nKey, String ip) {
-        throw new UnsupportedOperationException();
-    }
 
     DnsRecord getGDnsRecord(@Param("host") String host);
 

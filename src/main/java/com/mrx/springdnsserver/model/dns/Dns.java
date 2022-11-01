@@ -6,6 +6,7 @@ import lombok.experimental.Accessors;
 
 import java.util.List;
 import java.util.function.BiConsumer;
+import java.util.stream.Collectors;
 
 /**
  * @author Mr.X
@@ -20,15 +21,15 @@ public class Dns {
 
     private Integer hostId;
 
-    private List<String> ips;
+    private List<Integer> ipIds;
 
-    public Dns(Integer hostId, List<String> ips) {
-        this.hostId = hostId;
-        this.ips = ips;
+    public Dns(Host host, List<Integer> ip) {
+        this(host.getId(), ip);
     }
 
-    public Dns(Host host, List<String> ip) {
-        this(host.getId(), ip);
+    public Dns(Integer hostId, List<Integer> ipIds) {
+        this.hostId = hostId;
+        this.ipIds = ipIds;
     }
 
     /**
@@ -38,12 +39,12 @@ public class Dns {
      * @param ip   该 host 对应的 ip
      * @return dns 对象
      */
-    public static Dns of(Host host, List<String> ip) {
-        return new Dns(host, ip);
+    public static Dns of(Host host, List<DnsIp> ip) {
+        return new Dns(host, ip.stream().map(DnsIp::getId).collect(Collectors.toList()));
     }
 
-    public void forEach(BiConsumer<Integer, String> consumer) {
-        for (String ip : ips) consumer.accept(hostId, ip);
+    public void forEach(BiConsumer<Integer, Integer> consumer) {
+        for (Integer ipId : ipIds) consumer.accept(hostId, ipId);
     }
 
 }

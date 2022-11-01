@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.mrx.springdnsserver.mapper.DnsHostMapper">
+
+    <insert id="insertHost" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+        INSERT INTO tb_dns_host(host)
+        VALUES (#{host})
+    </insert>
+
+    <select id="getHostByHost" resultType="com.mrx.springdnsserver.model.dns.Host">
+        SELECT id, host, createTime
+        FROM tb_dns_host
+        WHERE host = #{host}
+    </select>
+
+</mapper>

@@ -24,9 +24,9 @@
     </resultMap>
 
     <insert id="addDns">
-        INSERT INTO tb_dns(host_id, ip) VALUES
-        <foreach collection="ips" item="ip" separator=",">
-            (#{hostId},#{ip})
+        INSERT INTO tb_dns(host_id, ip_id) VALUES
+        <foreach collection="ipIds" item="ipId" separator=",">
+            (#{hostId},#{ipId})
         </foreach>
     </insert>
 
@@ -36,19 +36,19 @@
     </insert>
 
     <insert id="addHost" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
-        INSERT INTO tb_host(host)
+        INSERT INTO tb_dns_host(host)
         VALUES (#{host})
     </insert>
 
     <update id="updateDns">
         UPDATE tb_dns
-        SET ip = ip
+        SET ip_id = #{ipId}
         WHERE host_id = #{hostId}
     </update>
 
     <select id="getDnsRecordByHost" resultMap="DnsRecordResultMap">
         SELECT id, host
-        FROM tb_host
+        FROM tb_dns_host
         WHERE host = #{host,jdbcType=VARCHAR}
     </select>
 
@@ -59,15 +59,15 @@
     </select>
 
     <select id="getIPsByHost" resultType="java.lang.String">
-        SELECT b.ip
-        FROM tb_host AS a
+        SELECT b.ip_id
+        FROM tb_dns_host AS a
                  INNER JOIN tb_dns AS b ON a.id = b.host_id
         WHERE a.host = #{host}
     </select>
 
     <select id="getHostFromDB" resultType="com.mrx.springdnsserver.model.dns.Host">
         SELECT *
-        FROM tb_host
+        FROM tb_dns_host
         WHERE host = #{host}
         LIMIT 1
     </select>
@@ -79,7 +79,7 @@
     </select>
 
     <select id="getIpsByHostId" resultType="String">
-        SELECT ip
+        SELECT ip_id
         FROM tb_dns
         WHERE host_id = #{hostId}
     </select>

@@ -6,7 +6,7 @@ logging:
   level:
     root: info
     com.mrx: debug
-    com.mrx.springdnsserver.mapper: info
+    com.mrx.springdnsserver.mapper: debug
   file:
     path: log
 dns:

@@ -1,7 +1,9 @@
 package com.mrx.springdnsserver;
 
+import com.mrx.springdnsserver.mapper.DnsHostMapper;
+import com.mrx.springdnsserver.mapper.DnsIpMapper;
 import com.mrx.springdnsserver.mapper.DnsMapper;
-import com.mrx.springdnsserver.model.dns.Dns;
+import com.mrx.springdnsserver.model.dns.DnsIp;
 import com.mrx.springdnsserver.model.dns.Host;
 import com.mrx.springdnsserver.service.DnsService;
 import org.junit.jupiter.api.Test;
@@ -25,24 +27,32 @@ class SpringDnsServerApplicationTests {
     @Autowired
     private DnsService dnsService;
 
+    @Autowired
+    private DnsIpMapper dnsIpMapper;
+
+    @Autowired
+    private DnsHostMapper dnsHostMapper;
+
+    @Test
+    public void v2Test() {
+        String ip = "1.1.1.1";
+        String host = "test.com";
+        dnsIpMapper.insertDnsIp(DnsIp.of("1.1.1.1"));
+        System.out.println(dnsIpMapper.getDnsIpByIp(ip));
+        dnsHostMapper.insertHost(Host.of(host));
+        System.out.println(dnsHostMapper.getHostByHost(host));
+    }
+
     @Test
     void countResolveTest() {
         logger.debug("一小时内的解析数量: {}", dnsService.countResolveByInterval(60, 10));
     }
 
     @Test
-    void dnsMapperTest() {
-        logger.debug("getIpsByHost: {}", dnsMapper.getIPsByHost("test.com"));
-        Host host = new Host();
-        host.setHost("t.com");
-        logger.debug("addHost: {}", dnsMapper.addHost(host));
-        logger.debug("addHost: {}", host);
-        Dns dns = new Dns();
-        dns.setHostId(host.getId());
-        dns.setIps(List.of("1.1.1.1", "2.2.2.2"));
-        dnsMapper.addDns(dns);
-        dns.setIps(List.of("6.6.6.6", "7.7.7.7"));
-        dns.forEach((hostId, ip) -> dnsMapper.updateDns(hostId, ip));
+    void addHostAndDnsTest() {
+        Host host = Host.of("test.com");
+        List<String> ips = List.of("127.0.0.1", "1.1.1.1");
+        dnsService.addHostAndDns(host, ips);
     }
 
 }

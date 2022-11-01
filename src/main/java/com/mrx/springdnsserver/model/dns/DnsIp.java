@@ -6,25 +6,25 @@ import lombok.experimental.Accessors;
 
 /**
  * @author Mr.X
- * @since 2022-10-30 16:39
+ * @since 2022-11-01 12:43
  */
 @Data
 @NoArgsConstructor
 @Accessors(chain = true)
-public class Host {
+public class DnsIp {
 
     private Integer id;
 
-    private String host;
+    private String ip;
 
     private Long createTime;
 
-    public Host(String host) {
-        this.host = host;
+    public DnsIp(String ip) {
+        this.ip = ip;
     }
 
-    public static Host of(String host) {
-        return new Host(host);
+    public static DnsIp of(String ip) {
+        return new DnsIp(ip);
     }
 
 }

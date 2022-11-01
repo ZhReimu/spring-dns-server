@@ -1,6 +1,7 @@
 package com.mrx.springdnsserver.service;
 
 import com.mrx.dns.resolver.IResolver;
+import com.mrx.springdnsserver.mapper.DnsIpMapper;
 import com.mrx.springdnsserver.mapper.DnsMapper;
 import com.mrx.springdnsserver.mapper.ResolveLogMapper;
 import com.mrx.springdnsserver.model.dns.*;
@@ -32,6 +33,13 @@ public class DnsService implements IResolver {
     private ResolveLogMapper mapper;
 
     private DnsMapper dnsMapper;
+
+    private DnsIpMapper dnsIpMapper;
+
+    @Autowired
+    public void setDnsIpMapper(DnsIpMapper dnsIpMapper) {
+        this.dnsIpMapper = dnsIpMapper;
+    }
 
     @Autowired
     public void setDnsMapper(DnsMapper dnsMapper) {
@@ -109,7 +117,8 @@ public class DnsService implements IResolver {
                         .map(InetAddress::getHostAddress)
                         .collect(Collectors.toList());
                 // 递归解析后, 将解析结果存入数据库
-                if (addHostAndDns(host, hosts)) logger.info("插入 host 与 dns 记录成功, 本次解析结果已缓存");
+                addHostAndDns(host, hosts);
+                logger.info("插入 host 与 dns 记录成功, 本次解析结果已缓存");
                 return hosts;
             } catch (Exception e) {
                 logger.warn("调用系统 dns 出错: {} -> {}", e.getLocalizedMessage(), e.getClass().getName());
@@ -125,18 +134,35 @@ public class DnsService implements IResolver {
      *
      * @param host 要添加的 host, 无 id
      * @param ips  该 host 所对应的 ip
-     * @return 添加结果
      */
-    public Boolean addHostAndDns(@NonNull final Host host, List<String> ips) {
+    public void addHostAndDns(@NonNull final Host host, List<String> ips) {
         // 添加 host 之前, 先检查 host 是否存在
         Host hostInDB = dnsMapper.getHostFromDB(host.getHost());
         // 若不存在, 先走添加 host 流程, 再走添加 dns 流程
         if (hostInDB == null) {
             // 执行了 addHost 后 host 就会有 id
-            return dnsMapper.addHost(host) && dnsMapper.addDns(Dns.of(host, ips));
+            dnsMapper.addHost(host);
+            // 插入 dns
+            dnsMapper.addDns(Dns.of(host, addDnsIps(ips)));
+        } else {
+            // 若存在, 走 添加 dns 流程, hostInDB 里包含 id
+            dnsMapper.addDns(Dns.of(hostInDB, addDnsIps(ips)));
         }
-        // 若存在, 走 添加 dns 流程, hostInDB 里包含 id
-        return dnsMapper.addDns(Dns.of(hostInDB, ips));
+    }
+
+    private List<DnsIp> addDnsIps(List<String> ips) {
+        // 当前 dns 记录所需的 ip, 没有 id
+        List<DnsIp> dnsIps = ips.stream().map(DnsIp::of).collect(Collectors.toList());
+        // tb_dns_ip 表里有的 ip
+        List<DnsIp> ipsInDB = dnsIpMapper.listDnsIpByIpd(ips);
+        // 获取 tb_dns_ip 表里没有的 ip
+        List<DnsIp> ipsNotExists = new ArrayList<>(dnsIps);
+        ipsNotExists.removeAll(ipsInDB);
+        // 批量插入, 插入完毕这些对象就 不会有 id, 这里必须一个个插入
+        ipsNotExists.forEach(it -> dnsIpMapper.insertDnsIp(it));
+        // 两部分 ip 组合起来
+        ipsInDB.addAll(ipsNotExists);
+        return ipsInDB;
     }
 
 }

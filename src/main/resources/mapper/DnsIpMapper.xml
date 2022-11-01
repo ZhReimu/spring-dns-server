@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.mrx.springdnsserver.mapper.DnsIpMapper">
+
+    <insert id="insertDnsIp" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+        INSERT INTO tb_dns_ip(ip)
+        VALUES (#{ip})
+    </insert>
+
+    <insert id="insertDnsIpBatch" useGeneratedKeys="true" keyColumn="id" keyProperty="id">
+        INSERT INTO tb_dns_ip(ip) VALUES
+        <foreach collection="ips" item="item" separator=",">
+            (#{item.ip})
+        </foreach>
+    </insert>
+
+    <select id="getDnsIpByIp" resultType="com.mrx.springdnsserver.model.dns.DnsIp">
+        SELECT id, ip, createTime
+        FROM tb_dns_ip
+        WHERE ip = #{ip}
+    </select>
+
+    <select id="listDnsIpByIpd" resultType="com.mrx.springdnsserver.model.dns.DnsIp">
+        SELECT id,ip,createTime FROM tb_dns_ip WHERE ip IN
+        <foreach collection="ips" item="ip" open="(" close=")" separator=",">
+            #{ip}
+        </foreach>
+    </select>
+
+</mapper>

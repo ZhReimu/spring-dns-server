@@ -17,13 +17,13 @@ import org.springframework.stereotype.Component;
 @Component
 public class DnsServerRunner implements ApplicationRunner {
 
-    private IResolver repository;
+    private IResolver resolver;
 
     private DnsServerConfig serverConfig;
 
     @Autowired
-    public void setRepository(IResolver repository) {
-        this.repository = repository;
+    public void setRepository(IResolver resolver) {
+        this.resolver = resolver;
     }
 
     @Autowired
@@ -36,7 +36,7 @@ public class DnsServerRunner implements ApplicationRunner {
         DnsServerConfig.configHolder = serverConfig;
         DefaultDnsServer dnsServer = DefaultDnsServer.getInstance(
                 serverConfig.getName(), serverConfig.getPort(),
-                DefaultResolver.getInstance(JsonHostResolver.getInstance(), repository)
+                DefaultResolver.getInstance(JsonHostResolver.getInstance(), resolver)
         );
         dnsServer.start(serverConfig.getMode());
     }

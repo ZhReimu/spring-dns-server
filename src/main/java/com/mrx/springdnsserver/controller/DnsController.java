@@ -1,10 +1,10 @@
 package com.mrx.springdnsserver.controller;
 
 import com.mrx.springdnsserver.mapper.DnsMapper;
-import com.mrx.springdnsserver.mapper.ResolveLogMapper;
 import com.mrx.springdnsserver.model.dns.Dns;
 import com.mrx.springdnsserver.model.dns.Host;
 import com.mrx.springdnsserver.model.result.Result;
+import com.mrx.springdnsserver.service.DnsService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,11 +29,11 @@ public class DnsController {
 
     private DnsMapper dnsMapper;
 
-    private ResolveLogMapper resolveLogMapper;
+    private DnsService dnsService;
 
     @Autowired
-    public void setResolveLogMapper(ResolveLogMapper resolveLogMapper) {
-        this.resolveLogMapper = resolveLogMapper;
+    public void setDnsService(DnsService dnsService) {
+        this.dnsService = dnsService;
     }
 
     @Autowired
@@ -57,7 +57,7 @@ public class DnsController {
             return dnsMapper.addDns(Dns.of(hostInDB, ip)) ? Result.success() : Result.fail();
         }
         // 若数据库中不存在 host 记录, 那就先插入 host 记录, 再 插入 dns 记录
-        return dnsMapper.addHostAndDns(Host.of(host), ip) ? Result.success() : Result.fail();
+        return dnsService.addHostAndDns(Host.of(host), ip) ? Result.success() : Result.fail();
     }
 
     @GetMapping("/query")
@@ -70,7 +70,7 @@ public class DnsController {
 
     @GetMapping("/info")
     public Result<?> getResolveInfo(@RequestParam @Positive(message = "interval 必须为 正整数") Integer interval) {
-        return Result.success(resolveLogMapper.countResolveByInterval(interval, 10));
+        return Result.success(dnsService.countResolveByInterval(interval, 10));
     }
 
 }

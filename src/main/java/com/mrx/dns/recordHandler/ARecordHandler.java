@@ -1,6 +1,6 @@
 package com.mrx.dns.recordHandler;
 
-import com.mrx.dns.resolver.Resolver;
+import com.mrx.dns.resolver.DefaultResolver;
 import com.mrx.dns.util.RecordUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,9 +19,9 @@ public class ARecordHandler implements IRecordHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(ARecordHandler.class);
 
-    private final Resolver resolver;
+    private final DefaultResolver resolver;
 
-    public ARecordHandler(Resolver resolver) {
+    public ARecordHandler(DefaultResolver resolver) {
         this.resolver = resolver;
     }
 

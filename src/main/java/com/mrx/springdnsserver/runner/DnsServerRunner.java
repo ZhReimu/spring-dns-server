@@ -1,8 +1,8 @@
 package com.mrx.springdnsserver.runner;
 
+import com.mrx.dns.resolver.DefaultResolver;
 import com.mrx.dns.resolver.IResolver;
 import com.mrx.dns.resolver.JsonHostResolver;
-import com.mrx.dns.resolver.Resolver;
 import com.mrx.dns.server.DefaultDnsServer;
 import com.mrx.springdnsserver.config.DnsServerConfig;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,7 +36,7 @@ public class DnsServerRunner implements ApplicationRunner {
         DnsServerConfig.configHolder = serverConfig;
         DefaultDnsServer dnsServer = DefaultDnsServer.getInstance(
                 serverConfig.getName(), serverConfig.getPort(),
-                Resolver.getInstance(JsonHostResolver.getInstance(), repository)
+                DefaultResolver.getInstance(JsonHostResolver.getInstance(), repository)
         );
         dnsServer.start(serverConfig.getMode());
     }

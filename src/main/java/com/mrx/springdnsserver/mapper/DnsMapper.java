@@ -2,7 +2,6 @@ package com.mrx.springdnsserver.mapper;
 
 import com.mrx.dns.repository.IHostRepository;
 import com.mrx.dns.resolver.IResolver;
-import com.mrx.dns.util.NetworkUtil;
 import com.mrx.springdnsserver.model.dns.*;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -15,7 +14,6 @@ import java.net.InetAddress;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.mrx.dns.util.NetworkUtil.ipChecker;
 import static com.mrx.dns.util.PerformanceUtil.runMeasure;
 
 /**
@@ -103,7 +101,7 @@ public interface DnsMapper extends IHostRepository, IResolver {
         DnsRecord gDnsRecord = getGDnsRecord(nKey);
         if (gDnsRecord != null) {
             logger.info("检测到泛域名: {} -> {}", nKey, gDnsRecord.getHost());
-            return ipChecker(gDnsRecord.getIps());
+            return gDnsRecord.getIps();
         }
         // 普通域名解析
         List<String> hosts = getIPsByHost(nKey);
@@ -115,7 +113,6 @@ public interface DnsMapper extends IHostRepository, IResolver {
                 hosts = Arrays.stream(InetAddress.getAllByName(nKey))
                         .filter(it -> it instanceof Inet4Address)
                         .map(InetAddress::getHostAddress)
-                        .map(NetworkUtil::ipChecker)
                         .collect(Collectors.toList());
                 // 递归解析后, 将解析结果存入数据库
                 if (addHostAndDns(host, hosts)) logger.info("插入 host 与 dns 记录成功, 本次解析结果已缓存");
@@ -126,7 +123,7 @@ public interface DnsMapper extends IHostRepository, IResolver {
                 hosts = Collections.emptyList();
             }
         }
-        return ipChecker(hosts);
+        return hosts;
     }
 
     /**

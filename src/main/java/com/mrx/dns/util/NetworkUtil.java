@@ -78,6 +78,7 @@ public class NetworkUtil {
      * @param ips 要检测的 ip
      * @return 检测完毕的 ip
      */
+    @SuppressWarnings("unused")
     public static List<String> ipChecker(List<String> ips) {
         Logger logger = LoggerFactory.getLogger(DnsMapper.class);
         List<String> cfIPList = List.of(cfIP);

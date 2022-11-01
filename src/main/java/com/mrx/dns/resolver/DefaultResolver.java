@@ -32,6 +32,7 @@ public class DefaultResolver implements IResolver {
         for (IResolver resolver : resolvers) {
             List<String> hostList = resolver.getIpsByHost(host, ip);
             if (!CollectionUtils.isEmpty(hostList)) return hostList.stream()
+                    .distinct()
                     .map(NetworkUtil::ipChecker)
                     .collect(Collectors.toList());
         }

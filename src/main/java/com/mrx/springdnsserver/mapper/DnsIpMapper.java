@@ -17,7 +17,7 @@ public interface DnsIpMapper {
 
     List<DnsIp> listDnsIpByIpd(@Param("ips") List<String> ips);
 
-    void insertDnsIp(@Param("ip") DnsIp ip);
+    void insertDnsIp(DnsIp ip);
 
     void insertDnsIpBatch(@Param("ips") List<DnsIp> ips);
 

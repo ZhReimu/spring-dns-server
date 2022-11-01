@@ -3,8 +3,8 @@ package com.mrx.dns.repository;
 import com.alibaba.fastjson2.JSON;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.ResourceUtils;
 
 import java.io.InputStream;
 import java.util.Collections;
@@ -33,7 +33,7 @@ public class HostsMap implements IHostRepository {
 
     @SuppressWarnings({"unchecked"})
     private void initHosts() {
-        try (InputStream ins = ResourceUtils.getFile("classpath:hosts.json").toURI().toURL().openStream()) {
+        try (InputStream ins = new ClassPathResource("hosts.json").getInputStream()) {
             map.putAll(JSON.parseObject(ins).to(HashMap.class));
             logger.debug("初始化 hosts: {}", map);
         } catch (Exception e) {

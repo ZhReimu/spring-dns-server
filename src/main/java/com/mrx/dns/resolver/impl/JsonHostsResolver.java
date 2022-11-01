@@ -1,6 +1,7 @@
-package com.mrx.dns.repository;
+package com.mrx.dns.resolver.impl;
 
 import com.alibaba.fastjson2.JSON;
+import com.mrx.dns.resolver.IResolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ClassPathResource;
@@ -13,21 +14,21 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 只有 host 解析的 {@link IHostRepository}
+ * 只有 host 解析的 {@link IResolver}
  *
  * @author Mr.X
- * @see HostsHashMap
+ * @see MemoryHostsResolver
  * @since 2022-10-31 16:22
  */
-public class HostsMap implements IHostRepository {
+public class JsonHostsResolver implements IResolver {
 
-    private static final Logger logger = LoggerFactory.getLogger(HostsMap.class);
+    private static final Logger logger = LoggerFactory.getLogger(JsonHostsResolver.class);
 
-    private static final HostsMap instance = new HostsMap();
+    private static final JsonHostsResolver instance = new JsonHostsResolver();
 
     private final Map<String, List<String>> map = new HashMap<>();
 
-    private HostsMap() {
+    private JsonHostsResolver() {
         initHosts();
     }
 
@@ -41,7 +42,7 @@ public class HostsMap implements IHostRepository {
         }
     }
 
-    public static HostsMap getInstance() {
+    public static JsonHostsResolver getInstance() {
         return instance;
     }
 

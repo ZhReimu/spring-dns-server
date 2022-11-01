@@ -1,6 +1,6 @@
 package com.mrx.springdnsserver.mapper;
 
-import com.mrx.dns.repository.IHostRepository;
+import com.mrx.dns.resolver.IResolver;
 import com.mrx.springdnsserver.model.dns.Dns;
 import com.mrx.springdnsserver.model.dns.DnsRecord;
 import com.mrx.springdnsserver.model.dns.Host;
@@ -14,7 +14,7 @@ import java.util.List;
  * @since 2022-10-30 16:27
  */
 @Mapper
-public interface DnsMapper extends IHostRepository {
+public interface DnsMapper extends IResolver {
 
     List<String> getIPsByHost(@Param("host") String host);
 

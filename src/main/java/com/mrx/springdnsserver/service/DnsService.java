@@ -1,6 +1,6 @@
 package com.mrx.springdnsserver.service;
 
-import com.mrx.dns.repository.IHostRepository;
+import com.mrx.dns.resolver.IResolver;
 import com.mrx.springdnsserver.mapper.DnsMapper;
 import com.mrx.springdnsserver.mapper.ResolveLogMapper;
 import com.mrx.springdnsserver.model.dns.*;
@@ -23,7 +23,7 @@ import static com.mrx.dns.util.PerformanceUtil.runMeasure;
  * @since 2022-11-01 11:23
  */
 @Service
-public class DnsService implements IHostRepository {
+public class DnsService implements IResolver {
 
     public static final List<ResolveLog> resolveLog = new ArrayList<>();
 

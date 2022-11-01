@@ -1,6 +1,6 @@
 package com.mrx.dns.util;
 
-import com.mrx.dns.repository.IHostRepository;
+import com.mrx.dns.resolver.IResolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,7 +12,7 @@ public class PerformanceUtil {
 
 
     public static <T> T runMeasure(XSupplier<T> supplier) throws Exception {
-        Logger logger = LoggerFactory.getLogger(IHostRepository.class);
+        Logger logger = LoggerFactory.getLogger(IResolver.class);
         long start = System.currentTimeMillis();
         T res = supplier.get();
         long end = System.currentTimeMillis();
@@ -21,7 +21,7 @@ public class PerformanceUtil {
     }
 
     public static void runMeasure(Runnable supplier) {
-        Logger logger = LoggerFactory.getLogger(IHostRepository.class);
+        Logger logger = LoggerFactory.getLogger(IResolver.class);
         long start = System.currentTimeMillis();
         supplier.run();
         long end = System.currentTimeMillis();

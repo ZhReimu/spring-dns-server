@@ -1,4 +1,4 @@
-package com.mrx.dns.repository;
+package com.mrx.dns.resolver;
 
 import lombok.SneakyThrows;
 
@@ -10,7 +10,7 @@ import static com.mrx.dns.util.PerformanceUtil.runMeasure;
  * @author Mr.X
  * @since 2022-10-30 17:07
  */
-public interface IHostRepository {
+public interface IResolver {
 
     /**
      * 使用 域名 查找 ip, 与 {@link #getIpsByHost(String, String)} 不同的是, 本方法会计算执行时间<br/>

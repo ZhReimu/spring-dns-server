@@ -1,6 +1,7 @@
 package com.mrx.springdnsserver;
 
 import com.mrx.springdnsserver.mapper.DnsMapper;
+import com.mrx.springdnsserver.mapper.ResolveLogMapper;
 import com.mrx.springdnsserver.model.dns.Dns;
 import com.mrx.springdnsserver.model.dns.Host;
 import org.junit.jupiter.api.Test;
@@ -21,9 +22,12 @@ class SpringDnsServerApplicationTests {
     @Autowired
     private DnsMapper dnsMapper;
 
+    @Autowired
+    private ResolveLogMapper resolveLogMapper;
+
     @Test
     void countResolveTest() {
-        logger.debug("一小时内的解析数量: {}", dnsMapper.countResolveByInterval(60, 10));
+        logger.debug("一小时内的解析数量: {}", resolveLogMapper.countResolveByInterval(60, 10));
     }
 
     @Test

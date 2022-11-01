@@ -35,7 +35,7 @@ public class HostsMap implements IHostRepository {
     private void initHosts() {
         try (InputStream ins = new ClassPathResource("hosts.json").getInputStream()) {
             map.putAll(JSON.parseObject(ins).to(HashMap.class));
-            logger.debug("初始化 hosts: {}", map);
+            logger.debug("初始化 {} 个 hosts", map.size());
         } catch (Exception e) {
             logger.warn("初始化 hosts 失败: {}", e.getLocalizedMessage());
         }

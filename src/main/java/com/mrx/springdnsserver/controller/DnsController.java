@@ -1,6 +1,7 @@
 package com.mrx.springdnsserver.controller;
 
 import com.mrx.springdnsserver.mapper.DnsMapper;
+import com.mrx.springdnsserver.mapper.ResolveLogMapper;
 import com.mrx.springdnsserver.model.dns.Dns;
 import com.mrx.springdnsserver.model.dns.Host;
 import com.mrx.springdnsserver.model.result.Result;
@@ -26,11 +27,18 @@ public class DnsController {
 
     private static final Logger logger = LoggerFactory.getLogger(DnsController.class);
 
-    private DnsMapper mapper;
+    private DnsMapper dnsMapper;
+
+    private ResolveLogMapper resolveLogMapper;
 
     @Autowired
-    public void setMapper(DnsMapper mapper) {
-        this.mapper = mapper;
+    public void setResolveLogMapper(ResolveLogMapper resolveLogMapper) {
+        this.resolveLogMapper = resolveLogMapper;
+    }
+
+    @Autowired
+    public void setDnsMapper(DnsMapper dnsMapper) {
+        this.dnsMapper = dnsMapper;
     }
 
     @GetMapping("/update")
@@ -39,30 +47,30 @@ public class DnsController {
             @RequestParam List<String> ip
     ) {
         logger.debug("updateDns: {} -> {}", host, ip);
-        Host hostInDB = mapper.getHostFromDB(host);
+        Host hostInDB = dnsMapper.getHostFromDB(host);
         logger.debug("hostInDB: {}", hostInDB);
         // 如果数据库中已存在 host 记录, 那就只管更新 dns
         if (hostInDB != null && !ip.isEmpty()) {
             if ("update".equals(action) && ip.size() == 1) {
-                return mapper.updateDns(hostInDB.getId(), ip.get(0)) ? Result.success() : Result.fail();
+                return dnsMapper.updateDns(hostInDB.getId(), ip.get(0)) ? Result.success() : Result.fail();
             }
-            return mapper.addDns(Dns.of(hostInDB, ip)) ? Result.success() : Result.fail();
+            return dnsMapper.addDns(Dns.of(hostInDB, ip)) ? Result.success() : Result.fail();
         }
         // 若数据库中不存在 host 记录, 那就先插入 host 记录, 再 插入 dns 记录
-        return mapper.addHostAndDns(Host.of(host), ip) ? Result.success() : Result.fail();
+        return dnsMapper.addHostAndDns(Host.of(host), ip) ? Result.success() : Result.fail();
     }
 
     @GetMapping("/query")
     public Result<?> queryDns(@RequestParam String host) {
         return Result.success(
-                Optional.ofNullable(mapper.getGDnsRecord(host).setHost(host))
-                        .orElse(mapper.getDnsRecordByHost(host))
+                Optional.ofNullable(dnsMapper.getGDnsRecord(host).setHost(host))
+                        .orElse(dnsMapper.getDnsRecordByHost(host))
         );
     }
 
     @GetMapping("/info")
     public Result<?> getResolveInfo(@RequestParam @Positive(message = "interval 必须为 正整数") Integer interval) {
-        return Result.success(mapper.countResolveByInterval(interval, 10));
+        return Result.success(resolveLogMapper.countResolveByInterval(interval, 10));
     }
 
 }

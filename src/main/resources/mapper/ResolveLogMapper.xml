@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.mrx.springdnsserver.mapper.ResolveLogMapper">
+
+
+    <insert id="insertLogBatch">
+        INSERT INTO tb_resolve_log(host,ip_id) VALUES
+        <foreach collection="resolveLog" item="host" separator=",">
+            (#{host.host},#{host.ipId})
+        </foreach>
+    </insert>
+
+
+    <insert id="insertResolveIp" useGeneratedKeys="true" keyColumn="id" keyProperty="id">
+        INSERT INTO tb_resolve_log_ip(ip)
+        VALUES (#{ip})
+    </insert>
+
+
+    <select id="getResolveIpByIp" resultType="LogIp">
+        SELECT id, ip
+        FROM tb_resolve_log_ip
+        WHERE ip = #{ip}
+    </select>
+
+    <select id="countResolveByPeriod" resultType="java.lang.Integer">
+        SELECT COUNT(*) AS resolveCount
+        FROM tb_resolve_log
+        WHERE createTime
+                  BETWEEN DATETIME(STRFTIME('%s', 'now') - 60 * #{start}, 'unixepoch', 'localtime')
+                  AND DATETIME(STRFTIME('%s', 'now') - 60 * #{end}, 'unixepoch', 'localtime')
+    </select>
+
+</mapper>

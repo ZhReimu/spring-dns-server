@@ -13,16 +13,6 @@
         </collection>
     </resultMap>
 
-    <resultMap id="GDnsRecordResultMap" type="DnsRecord">
-        <id column="id" property="id"/>
-        <result column="host" property="host"/>
-        <!-- 一对多的关系 -->
-        <!-- property: 指的是集合属性的值,对应类中的属性名 ofType：指的是集合中元素的类型 -->
-        <collection property="ips" column="id" ofType="String" select="getGHostIpsByGHost">
-            <result column="ip"/>
-        </collection>
-    </resultMap>
-
     <insert id="addDns">
         INSERT INTO tb_dns(host_id, ip_id) VALUES
         <foreach collection="ipIds" item="ipId" separator=",">
@@ -47,12 +37,6 @@
         WHERE host = #{host,jdbcType=VARCHAR}
     </select>
 
-    <select id="getGDnsRecord" resultMap="GDnsRecordResultMap">
-        SELECT id, host
-        FROM tb_generic_host
-        WHERE INSTR(#{host}, SUBSTRING(host, 3, LENGTH(host))) > 0
-    </select>
-
     <select id="getIPsByHost" resultType="java.lang.String">
         SELECT c.ip
         FROM tb_dns_host AS a
@@ -66,18 +50,6 @@
         FROM tb_dns_host
         WHERE host = #{host}
         LIMIT 1
-    </select>
-
-    <select id="getGHostIpsByGHost" resultType="String">
-        SELECT ip
-        FROM tb_generic_dns
-        WHERE host_id = #{hostId}
-    </select>
-
-    <select id="getIpsByHostId" resultType="String">
-        SELECT ip_id
-        FROM tb_dns
-        WHERE host_id = #{hostId}
     </select>
 
 

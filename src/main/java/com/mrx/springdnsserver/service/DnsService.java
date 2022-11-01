@@ -1,10 +1,7 @@
 package com.mrx.springdnsserver.service;
 
 import com.mrx.dns.resolver.IResolver;
-import com.mrx.springdnsserver.mapper.DnsIpMapper;
-import com.mrx.springdnsserver.mapper.DnsMapper;
-import com.mrx.springdnsserver.mapper.ErrorHostMapper;
-import com.mrx.springdnsserver.mapper.ResolveLogMapper;
+import com.mrx.springdnsserver.mapper.*;
 import com.mrx.springdnsserver.model.dns.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,9 +32,16 @@ public class DnsService implements IResolver {
 
     private DnsMapper dnsMapper;
 
+    private GDnsMapper gDnsMapper;
+
     private DnsIpMapper dnsIpMapper;
 
     private ErrorHostMapper errorHostMapper;
+
+    @Autowired
+    public void setgDnsMapper(GDnsMapper gDnsMapper) {
+        this.gDnsMapper = gDnsMapper;
+    }
 
     @Autowired
     public void setErrorHostMapper(ErrorHostMapper errorHostMapper) {
@@ -108,7 +112,7 @@ public class DnsService implements IResolver {
             resolveLog.add(ResolveLog.of(nKey, ip));
         }
         // 实现 泛域名解析
-        DnsRecord gDnsRecord = dnsMapper.getGDnsRecord(nKey);
+        DnsRecord gDnsRecord = gDnsMapper.getGDnsRecord(nKey);
         if (gDnsRecord != null) {
             logger.info("检测到泛域名: {} -> {}", nKey, gDnsRecord.getHost());
             return gDnsRecord.getIps();
@@ -171,6 +175,10 @@ public class DnsService implements IResolver {
         // 两部分 ip 组合起来
         ipsInDB.addAll(ipsNotExists);
         return ipsInDB;
+    }
+
+    public DnsRecord getGDnsRecord(String host) {
+        return gDnsMapper.getGDnsRecord(host);
     }
 
 }

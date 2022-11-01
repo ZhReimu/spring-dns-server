@@ -2,7 +2,6 @@ package com.mrx.dns.resolver.impl;
 
 import com.mrx.dns.repository.HostsMap;
 import com.mrx.dns.repository.IHostRepository;
-import com.mrx.dns.resolver.IResolver;
 
 import java.util.List;
 
@@ -10,7 +9,7 @@ import java.util.List;
  * @author Mr.X
  * @since 2022-10-31 16:52
  */
-public class JsonHostResolver implements IResolver {
+public class JsonHostResolver implements IHostRepository {
 
     private static final IHostRepository hostsMap = HostsMap.getInstance();
 

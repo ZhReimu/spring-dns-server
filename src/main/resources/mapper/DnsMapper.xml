@@ -59,9 +59,10 @@
     </select>
 
     <select id="getIPsByHost" resultType="java.lang.String">
-        SELECT b.ip_id
+        SELECT c.ip
         FROM tb_dns_host AS a
                  INNER JOIN tb_dns AS b ON a.id = b.host_id
+                 INNER JOIN tb_dns_ip AS c ON c.id = b.ip_id
         WHERE a.host = #{host}
     </select>
 

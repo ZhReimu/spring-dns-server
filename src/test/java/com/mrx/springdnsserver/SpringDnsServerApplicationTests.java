@@ -55,4 +55,9 @@ class SpringDnsServerApplicationTests {
         dnsService.addHostAndDns(host, ips);
     }
 
+    @Test
+    void dnsMapperGetIPsByHostTest() {
+        System.out.println(dnsMapper.getIPsByHost("find.qq.com"));
+    }
+
 }
